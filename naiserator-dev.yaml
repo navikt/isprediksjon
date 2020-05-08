@@ -36,8 +36,6 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: /kv/preprod/fss/isprediksjon/default
-        mountPath: /secrets/default
       - kvPath: serviceuser/data/dev/srvisprediksjon
         mountPath: /secrets/serviceuser
   ingresses:
