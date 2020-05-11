@@ -4,15 +4,16 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 group = "no.nav.syfo"
 version = "1.0.0"
 
+val kafkaVersion = "2.0.0"
 val ktorVersion = "1.3.2"
 val logbackVersion = "1.2.3"
 val logstashEncoderVersion = "5.1"
 val prometheusVersion = "0.6.0"
+val smCommonVersion = "1.0.22"
 
 plugins {
     kotlin("jvm") version "1.3.72"
     id("com.github.johnrengelman.shadow") version "5.2.0"
-    id("org.jmailen.kotlinter") version "2.2.0"
 }
 
 repositories {
@@ -31,6 +32,10 @@ dependencies {
 
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
+
+    implementation("org.apache.kafka:kafka_2.12:$kafkaVersion")
+    implementation("no.nav.syfo.sm:syfosm-common-models:$smCommonVersion")
+    implementation("no.nav.syfo.sm:syfosm-common-kafka:$smCommonVersion")
 }
 
 tasks {
