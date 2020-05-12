@@ -43,6 +43,7 @@ fun main() {
 
     launchListeners(
         applicationState,
+        env,
         kafkaConsumers
     )
 }
@@ -66,6 +67,7 @@ fun createListener(applicationState: ApplicationState, action: suspend Coroutine
 @KtorExperimentalAPI
 fun launchListeners(
     applicationState: ApplicationState,
+    env: Environment,
     kafkaConsumers: KafkaConsumers
 ) {
     createListener(applicationState) {
@@ -73,7 +75,7 @@ fun launchListeners(
 
         applicationState.ready = true
 
-        kafkaConsumerSmReg.subscribe(listOf("privat-syfo-sm2013-behandlingsUtfall"))
+        kafkaConsumerSmReg.subscribe(env.kafkatopics)
         blockingApplicationLogic(
             applicationState,
             kafkaConsumerSmReg

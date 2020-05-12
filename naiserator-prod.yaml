@@ -43,3 +43,5 @@ spec:
   env:
     - name: KAFKA_BOOTSTRAP_SERVERS_URL
       value: SASL_SSL://a01apvl00145.adeo.no:8443,SASL_SSL://a01apvl00146.adeo.no:8443,SASL_SSL://a01apvl00147.adeo.no:8443,SASL_SSL://a01apvl00149.adeo.no:8443
+    - name: SMREG_KAFKA_TOPICS
+        value: privat-syfo-sm2013-manuellBehandling,privat-syfo-sm2013-automatiskBehandling,privat-syfosmregister-received-sykmelding-backup,privat-syfo-sm2013-behandlingsUtfall,privat-syfosmregister-behandlingsutfall-backup,aapen-syfo-sykmeldingstatus-leesah-v1,privat-syfo-register-status-backup

@@ -43,3 +43,5 @@ spec:
   env:
     - name: KAFKA_BOOTSTRAP_SERVERS_URL
       value: SSL://b27apvl00045.preprod.local:8443,SSL://b27apvl00046.preprod.local:8443,SSL://b27apvl00047.preprod.local:8443
+    - name: SMREG_KAFKA_TOPICS
+      value: privat-syfo-sm2013-manuellBehandling,privat-syfo-sm2013-automatiskBehandling,privat-syfosmregister-received-sykmelding-backup,privat-syfo-sm2013-behandlingsUtfall,privat-syfosmregister-behandlingsutfall-backup,aapen-syfo-sykmeldingstatus-leesah-v1,privat-syfo-register-status-backup
