@@ -34,7 +34,6 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
 
     implementation("org.apache.kafka:kafka_2.12:$kafkaVersion")
-    implementation("no.nav.syfo.sm:syfosm-common-models:$smCommonVersion")
     implementation("no.nav.syfo.sm:syfosm-common-kafka:$smCommonVersion")
 }
 
