@@ -21,6 +21,6 @@ fun handleRecivedMessage(
             env.syfoRegisterStatusBackupTopic -> log.info("Recieved message from ${env.syfoRegisterStatusBackupTopic}")
         }
     } catch (e: Exception) {
-        log.error("Noe feilet! :( ${e.message}")
+        log.error("Noe feilet! :( Skulle lese data med key ${consumerRecord.key()} fra topic: ${consumerRecord.topic()} ${e.message}")
     }
 }
