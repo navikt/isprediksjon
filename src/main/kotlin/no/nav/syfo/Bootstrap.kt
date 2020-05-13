@@ -8,6 +8,7 @@ import no.nav.syfo.application.ApplicationServer
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.createApplicationEngine
 import no.nav.syfo.clients.KafkaConsumers
+import no.nav.syfo.persistance.handleRecivedMessage
 import no.nav.syfo.util.getFileAsString
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.slf4j.Logger
@@ -43,6 +44,7 @@ fun main() {
 
     launchListeners(
         applicationState,
+        env,
         kafkaConsumers
     )
 }
@@ -66,6 +68,7 @@ fun createListener(applicationState: ApplicationState, action: suspend Coroutine
 @KtorExperimentalAPI
 fun launchListeners(
     applicationState: ApplicationState,
+    env: Environment,
     kafkaConsumers: KafkaConsumers
 ) {
     createListener(applicationState) {
@@ -73,9 +76,10 @@ fun launchListeners(
 
         applicationState.ready = true
 
-        kafkaConsumerSmReg.subscribe(listOf("privat-syfo-sm2013-behandlingsUtfall"))
+        kafkaConsumerSmReg.subscribe(env.kafkaConsumerTopics)
         blockingApplicationLogic(
             applicationState,
+            env,
             kafkaConsumerSmReg
         )
     }
@@ -84,13 +88,14 @@ fun launchListeners(
 @KtorExperimentalAPI
 suspend fun blockingApplicationLogic(
     applicationState: ApplicationState,
+    env: Environment,
     kafkaConsumer: KafkaConsumer<String, String>
 ) {
     while (applicationState.ready) {
         kafkaConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
-            val recievedSmRegObjekt: String = consumerRecord.value()
-
             log.info("Mottok objekt fra kafka topic ${consumerRecord.topic()} med key ${consumerRecord.key()}")
+
+            handleRecivedMessage(env, consumerRecord)
         }
         delay(100)
     }
