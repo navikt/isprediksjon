@@ -57,3 +57,9 @@ spec:
       value: aapen-syfo-sykmeldingstatus-leesah-v1
     - name: KAFKA_SYFO_REGISTER_STATUS_BACKUP_TOPIC
       value: privat-syfo-register-status-backup
+    - name: DATABASE_MOUNT_PATH_VAULT
+      value: /postgresql/preprod-fss
+    - name: DATABASE_NAME
+      value: isprediksjon
+    - name: ISPREDIKSJON_DB_URL
+      value: jdbc:postgresql://b27dbvl015.preprod.local:5432/isprediksjon

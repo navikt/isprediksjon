@@ -2,11 +2,13 @@ package no.nav.syfo.persistance
 
 import io.ktor.util.KtorExperimentalAPI
 import no.nav.syfo.Environment
+import no.nav.syfo.database.Database
 import no.nav.syfo.log
 import org.apache.kafka.clients.consumer.ConsumerRecord
 
 @KtorExperimentalAPI
 fun handleRecivedMessage(
+    database: Database,
     env: Environment,
     consumerRecord: ConsumerRecord<String, String>
 ) {

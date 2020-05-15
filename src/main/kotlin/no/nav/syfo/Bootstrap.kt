@@ -8,8 +8,11 @@ import no.nav.syfo.application.ApplicationServer
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.createApplicationEngine
 import no.nav.syfo.clients.KafkaConsumers
+import no.nav.syfo.database.Database
+import no.nav.syfo.database.VaultCredentialService
 import no.nav.syfo.persistance.handleRecivedMessage
 import no.nav.syfo.util.getFileAsString
+import no.nav.syfo.vault.RenewVaultService
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -25,6 +28,9 @@ fun main() {
         serviceuserPassword = getFileAsString("/secrets/serviceuser/password"),
         serviceuserUsername = getFileAsString("/secrets/serviceuser/username")
     )
+
+    val vaultCredentialService = VaultCredentialService()
+    val database = Database(env, vaultCredentialService)
 
     val applicationState = ApplicationState()
 
@@ -42,8 +48,13 @@ fun main() {
 
     log.info("Hello from isprediksjon")
 
+    if (!env.developmentMode) {
+        RenewVaultService(vaultCredentialService, applicationState).startRenewTasks()
+    }
+
     launchListeners(
         applicationState,
+        database,
         env,
         kafkaConsumers
     )
@@ -68,6 +79,7 @@ fun createListener(applicationState: ApplicationState, action: suspend Coroutine
 @KtorExperimentalAPI
 fun launchListeners(
     applicationState: ApplicationState,
+    database: Database,
     env: Environment,
     kafkaConsumers: KafkaConsumers
 ) {
@@ -79,6 +91,7 @@ fun launchListeners(
         kafkaConsumerSmReg.subscribe(env.kafkaConsumerTopics)
         blockingApplicationLogic(
             applicationState,
+            database,
             env,
             kafkaConsumerSmReg
         )
@@ -88,6 +101,7 @@ fun launchListeners(
 @KtorExperimentalAPI
 suspend fun blockingApplicationLogic(
     applicationState: ApplicationState,
+    database: Database,
     env: Environment,
     kafkaConsumer: KafkaConsumer<String, String>
 ) {
@@ -95,7 +109,7 @@ suspend fun blockingApplicationLogic(
         kafkaConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
             log.info("Mottok objekt fra kafka topic ${consumerRecord.topic()} med key ${consumerRecord.key()}")
 
-            handleRecivedMessage(env, consumerRecord)
+            handleRecivedMessage(database, env, consumerRecord)
         }
         delay(100)
     }

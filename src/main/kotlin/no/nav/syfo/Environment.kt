@@ -6,6 +6,7 @@ import no.nav.syfo.kafka.KafkaCredentials
 data class Environment(
     val applicationName: String = getEnvVar("NAIS_APP_NAME", "isprediksjon"),
     val applicationPort: Int = getEnvVar("APPLICATION_PORT", "8080").toInt(),
+
     override val kafkaBootstrapServers: String = getEnvVar("KAFKA_BOOTSTRAP_SERVERS_URL"),
     val sm2013ManuellBehandlingTopic: String = getEnvVar("KAFKA_SM2013_MANUELL_BEHANDLING", "privat-syfo-sm2013-manuellBehandling"),
     val sm2013AutomatiskBehandlingTopic: String = getEnvVar("KAFKA_SM2013_AUTOMATISK_BEHANDLING_TOPIC", "privat-syfo-sm2013-automatiskBehandling"),
@@ -14,7 +15,13 @@ data class Environment(
     val smregisterBehandlingsutfallBackupTopic: String = getEnvVar("KAFKA_SMREGISTER_BEHANDLINGSUTFALL_BACKUP_TOPIC", "privat-syfosmregister-behandlingsutfall-backup"),
     val syfoSykmeldingstatusLeesahTopic: String = getEnvVar("KAFKA_SYFO_SYKMELDINGSTATUS_LEESAH_TOPIC", "aapen-syfo-sykmeldingstatus-leesah-v1"),
     val syfoRegisterStatusBackupTopic: String = getEnvVar("KAFKA_SYFO_REGISTER_STATUS_BACKUP_TOPIC", "privat-syfo-register-status-backup"),
-    val kafkaConsumerTopics: List<String> = listOf(sm2013ManuellBehandlingTopic, sm2013AutomatiskBehandlingTopic, smregisterRecievedSykmeldingBackupTopic, sm2013BehandlingsutfallTopic, smregisterBehandlingsutfallBackupTopic, syfoSykmeldingstatusLeesahTopic, syfoRegisterStatusBackupTopic)
+    val kafkaConsumerTopics: List<String> = listOf(sm2013ManuellBehandlingTopic, sm2013AutomatiskBehandlingTopic, smregisterRecievedSykmeldingBackupTopic, sm2013BehandlingsutfallTopic, smregisterBehandlingsutfallBackupTopic, syfoSykmeldingstatusLeesahTopic, syfoRegisterStatusBackupTopic),
+
+    val databaseMountPathVault: String = getEnvVar("DATABASE_MOUNT_PATH_VAULT"),
+    val databaseName: String = getEnvVar("DATABASE_NAME", "isprediksjon"),
+    val isprediksjonDBURL: String = getEnvVar("ISPREDIKSJON_DB_URL"),
+
+    val developmentMode: Boolean = getEnvVar("DEVELOPMENT_MODE", "false").toBoolean()
 ) : KafkaConfig
 
 data class VaultSecrets(
