@@ -88,6 +88,7 @@ fun launchListeners(
 
         applicationState.ready = true
 
+        log.info("Subscribing to topics: ${env.kafkaConsumerTopics}")
         kafkaConsumerSmReg.subscribe(env.kafkaConsumerTopics)
         blockingApplicationLogic(
             applicationState,
@@ -107,8 +108,6 @@ suspend fun blockingApplicationLogic(
 ) {
     while (applicationState.ready) {
         kafkaConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
-            log.info("Mottok objekt fra kafka topic ${consumerRecord.topic()} med key ${consumerRecord.key()}")
-
             handleRecivedMessage(database, env, consumerRecord)
         }
         delay(100)
