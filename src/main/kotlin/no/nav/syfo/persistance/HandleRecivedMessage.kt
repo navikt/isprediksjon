@@ -14,15 +14,16 @@ fun handleRecivedMessage(
 ) {
     try {
         when (consumerRecord.topic()) {
-            env.sm2013ManuellBehandlingTopic -> log.info("Recieved message from ${env.sm2013ManuellBehandlingTopic}")
-            env.sm2013AutomatiskBehandlingTopic -> log.info("Recieved message from ${env.sm2013AutomatiskBehandlingTopic}")
-            env.smregisterRecievedSykmeldingBackupTopic -> log.info("Recieved message from ${env.smregisterRecievedSykmeldingBackupTopic}")
-            env.sm2013BehandlingsutfallTopic -> log.info("Recieved message from ${env.sm2013BehandlingsutfallTopic}")
-            env.smregisterBehandlingsutfallBackupTopic -> log.info("Recieved message from ${env.smregisterBehandlingsutfallBackupTopic}")
-            env.syfoSykmeldingstatusLeesahTopic -> log.info("Recieved message from ${env.syfoSykmeldingstatusLeesahTopic}")
-            env.syfoRegisterStatusBackupTopic -> log.info("Recieved message from ${env.syfoRegisterStatusBackupTopic}")
+            env.sm2013ManuellBehandlingTopic -> log.info("Recieved message from ${env.sm2013ManuellBehandlingTopic} with key ${consumerRecord.key()}")
+            env.sm2013AutomatiskBehandlingTopic -> log.info("Recieved message from ${env.sm2013AutomatiskBehandlingTopic} with key ${consumerRecord.key()}")
+            env.smregisterRecievedSykmeldingBackupTopic -> log.info("Recieved message from ${env.smregisterRecievedSykmeldingBackupTopic} with key ${consumerRecord.key()}")
+            env.sm2013BehandlingsutfallTopic -> log.info("Recieved message from ${env.sm2013BehandlingsutfallTopic} with key ${consumerRecord.key()}")
+            env.smregisterBehandlingsutfallBackupTopic -> log.info("Recieved message from ${env.smregisterBehandlingsutfallBackupTopic} with key ${consumerRecord.key()}")
+            env.syfoSykmeldingstatusLeesahTopic -> log.info("Recieved message from ${env.syfoSykmeldingstatusLeesahTopic} with key ${consumerRecord.key()}")
+            env.syfoRegisterStatusBackupTopic -> log.info("Recieved message from ${env.syfoRegisterStatusBackupTopic} with key ${consumerRecord.key()}")
         }
     } catch (e: Exception) {
         log.error("Noe feilet! :( Skulle lese data med key ${consumerRecord.key()} fra topic: ${consumerRecord.topic()} ${e.message}")
+        throw e
     }
 }
