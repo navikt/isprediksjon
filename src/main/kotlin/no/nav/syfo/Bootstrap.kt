@@ -10,7 +10,7 @@ import no.nav.syfo.application.createApplicationEngine
 import no.nav.syfo.clients.KafkaConsumers
 import no.nav.syfo.database.Database
 import no.nav.syfo.database.VaultCredentialService
-import no.nav.syfo.persistance.handleRecivedMessage
+import no.nav.syfo.persistence.handleReceivedMessage
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.vault.RenewVaultService
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -108,7 +108,7 @@ suspend fun blockingApplicationLogic(
 ) {
     while (applicationState.ready) {
         kafkaConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
-            handleRecivedMessage(database, env, consumerRecord)
+            handleReceivedMessage(database, env, consumerRecord)
         }
         delay(100)
     }
