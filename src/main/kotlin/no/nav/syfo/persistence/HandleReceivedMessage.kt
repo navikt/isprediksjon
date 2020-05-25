@@ -4,26 +4,59 @@ import io.ktor.util.KtorExperimentalAPI
 import no.nav.syfo.Environment
 import no.nav.syfo.database.Database
 import no.nav.syfo.log
+import no.nav.syfo.persistence.db.*
 import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.apache.kafka.common.TopicPartition
 
 @KtorExperimentalAPI
 fun handleReceivedMessage(
     database: Database,
     env: Environment,
-    consumerRecord: ConsumerRecord<String, String>
+    consumerRecord: ConsumerRecord<String, String>,
+    endOffsets: Map<TopicPartition, Long>
 ) {
     try {
         when (consumerRecord.topic()) {
-            env.sm2013ManuellBehandlingTopic -> log.info("Recieved message from ${env.sm2013ManuellBehandlingTopic} with key ${consumerRecord.key()}")
-            env.sm2013AutomatiskBehandlingTopic -> log.info("Recieved message from ${env.sm2013AutomatiskBehandlingTopic} with key ${consumerRecord.key()}")
-            env.smregisterRecievedSykmeldingBackupTopic -> log.info("Recieved message from ${env.smregisterRecievedSykmeldingBackupTopic} with key ${consumerRecord.key()}")
-            env.sm2013BehandlingsutfallTopic -> log.info("Recieved message from ${env.sm2013BehandlingsutfallTopic} with key ${consumerRecord.key()}")
-            env.smregisterBehandlingsutfallBackupTopic -> log.info("Recieved message from ${env.smregisterBehandlingsutfallBackupTopic} with key ${consumerRecord.key()}")
-            env.syfoSykmeldingstatusLeesahTopic -> log.info("Recieved message from ${env.syfoSykmeldingstatusLeesahTopic} with key ${consumerRecord.key()}")
-            env.syfoRegisterStatusBackupTopic -> log.info("Recieved message from ${env.syfoRegisterStatusBackupTopic} with key ${consumerRecord.key()}")
+            env.sm2013ManuellBehandlingTopic -> {
+                logIfDoneWithPartition(consumerRecord, endOffsets)
+                database.createSmManuellBehandling(consumerRecord.value(), consumerRecord.key())
+            }
+            env.sm2013AutomatiskBehandlingTopic -> {
+                logIfDoneWithPartition(consumerRecord, endOffsets)
+                database.createSmAutomatiskBehandling(consumerRecord.value(), consumerRecord.key())
+            }
+            env.smregisterRecievedSykmeldingBackupTopic -> {
+                logIfDoneWithPartition(consumerRecord, endOffsets)
+                database.createSmHist(consumerRecord.value(), consumerRecord.key())
+            }
+            env.sm2013BehandlingsutfallTopic -> {
+                logIfDoneWithPartition(consumerRecord, endOffsets)
+                database.createSmBehandlingsutfall(consumerRecord.value(), consumerRecord.key())
+            }
+            env.smregisterBehandlingsutfallBackupTopic -> {
+                logIfDoneWithPartition(consumerRecord, endOffsets)
+                database.createSmBehandlingsutfallHist(consumerRecord.value(), consumerRecord.key())
+            }
+            env.syfoSykmeldingstatusLeesahTopic -> {
+                logIfDoneWithPartition(consumerRecord, endOffsets)
+                database.createSmSykmeldingstatus(consumerRecord.value(), consumerRecord.key())
+            }
+            env.syfoRegisterStatusBackupTopic -> {
+                logIfDoneWithPartition(consumerRecord, endOffsets)
+                database.createSmSykmeldingstatusHist(consumerRecord.value(), consumerRecord.key())
+            }
         }
     } catch (e: Exception) {
-        log.error("Noe feilet! :( Skulle lese data med key ${consumerRecord.key()} fra topic: ${consumerRecord.topic()} ${e.message}")
+        log.error("Noe feilet! :( Skulle lese data med key ${consumerRecord.key()} fra topic: ${consumerRecord.topic()}, for partition ${consumerRecord.partition()} with offset ${consumerRecord.offset()}. ${e.message}")
         throw e
+    }
+}
+
+fun logIfDoneWithPartition(consumerRecord: ConsumerRecord<String, String>, endOffsets: Map<TopicPartition, Long>) {
+    val topicPartition = TopicPartition(consumerRecord.topic(), consumerRecord.partition())
+    val endForThisPartition = endOffsets[topicPartition]
+
+    if(endForThisPartition != null && (endForThisPartition - 1) == consumerRecord.offset()) {
+        log.info("Kafka-trace: Er på endOffset for ${consumerRecord.topic()}-${consumerRecord.partition()}, med offset ${consumerRecord.offset()}. Endoffsets: $endOffsets")
     }
 }

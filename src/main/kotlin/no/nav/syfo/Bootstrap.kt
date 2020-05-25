@@ -13,7 +13,9 @@ import no.nav.syfo.database.VaultCredentialService
 import no.nav.syfo.persistence.handleReceivedMessage
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.vault.RenewVaultService
+import org.apache.kafka.clients.consumer.ConsumerRebalanceListener
 import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.common.TopicPartition
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Duration
@@ -85,11 +87,33 @@ fun launchListeners(
 ) {
     createListener(applicationState) {
         val kafkaConsumerSmReg = kafkaConsumers.kafkaConsumerSmReg
+        val alreadyResetPartitions = mutableListOf<TopicPartition>()
+
+        val subscriptionCallback = object : ConsumerRebalanceListener {
+            override fun onPartitionsAssigned(partitions: MutableCollection<TopicPartition>?) {
+                val wantedPartitions: Collection<TopicPartition> =
+                    partitions!!.filter { !alreadyResetPartitions.contains(it) }
+
+                if (wantedPartitions.isNotEmpty()) {
+                    log.info("Kafka-trace: Seek to beginning for partitions $wantedPartitions. We already have reset these partitions: $alreadyResetPartitions")
+                    kafkaConsumerSmReg.seekToBeginning(wantedPartitions)
+                } else {
+                    log.info("Kafka-trace: Didn't seek to beginning for any of candidates $partitions because we have them in alreadyReset list: $alreadyResetPartitions")
+                }
+
+                alreadyResetPartitions.addAll(wantedPartitions)
+            }
+
+            override fun onPartitionsRevoked(partitions: MutableCollection<TopicPartition>?) {}
+        }
 
         applicationState.ready = true
 
         log.info("Subscribing to topics: ${env.kafkaConsumerTopics}")
-        kafkaConsumerSmReg.subscribe(env.kafkaConsumerTopics)
+        kafkaConsumerSmReg.subscribe(
+            env.kafkaConsumerTopics,
+            subscriptionCallback
+        )
         blockingApplicationLogic(
             applicationState,
             database,
@@ -107,8 +131,9 @@ suspend fun blockingApplicationLogic(
     kafkaConsumer: KafkaConsumer<String, String>
 ) {
     while (applicationState.ready) {
+        val endOffsets = kafkaConsumer.endOffsets(kafkaConsumer.assignment())
         kafkaConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
-            handleReceivedMessage(database, env, consumerRecord)
+            handleReceivedMessage(database, env, consumerRecord, endOffsets)
         }
         delay(100)
     }
