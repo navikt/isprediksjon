@@ -18,31 +18,31 @@ fun handleReceivedMessage(
     try {
         when (consumerRecord.topic()) {
             env.sm2013ManuellBehandlingTopic -> {
-                logIfDoneWithPartition(consumerRecord, endOffsets)
+                logProgressForPartition(consumerRecord, endOffsets)
                 database.createSmManuellBehandling(consumerRecord.value(), consumerRecord.key())
             }
             env.sm2013AutomatiskBehandlingTopic -> {
-                logIfDoneWithPartition(consumerRecord, endOffsets)
+                logProgressForPartition(consumerRecord, endOffsets)
                 database.createSmAutomatiskBehandling(consumerRecord.value(), consumerRecord.key())
             }
             env.smregisterRecievedSykmeldingBackupTopic -> {
-                logIfDoneWithPartition(consumerRecord, endOffsets)
+                logProgressForPartition(consumerRecord, endOffsets)
                 database.createSmHist(consumerRecord.value(), consumerRecord.key())
             }
             env.sm2013BehandlingsutfallTopic -> {
-                logIfDoneWithPartition(consumerRecord, endOffsets)
+                logProgressForPartition(consumerRecord, endOffsets)
                 database.createSmBehandlingsutfall(consumerRecord.value(), consumerRecord.key())
             }
             env.smregisterBehandlingsutfallBackupTopic -> {
-                logIfDoneWithPartition(consumerRecord, endOffsets)
+                logProgressForPartition(consumerRecord, endOffsets)
                 database.createSmBehandlingsutfallHist(consumerRecord.value(), consumerRecord.key())
             }
             env.syfoSykmeldingstatusLeesahTopic -> {
-                logIfDoneWithPartition(consumerRecord, endOffsets)
+                logProgressForPartition(consumerRecord, endOffsets)
                 database.createSmSykmeldingstatus(consumerRecord.value(), consumerRecord.key())
             }
             env.syfoRegisterStatusBackupTopic -> {
-                logIfDoneWithPartition(consumerRecord, endOffsets)
+                logProgressForPartition(consumerRecord, endOffsets)
                 database.createSmSykmeldingstatusHist(consumerRecord.value(), consumerRecord.key())
             }
         }
@@ -52,11 +52,43 @@ fun handleReceivedMessage(
     }
 }
 
-fun logIfDoneWithPartition(consumerRecord: ConsumerRecord<String, String>, endOffsets: Map<TopicPartition, Long>) {
-    val topicPartition = TopicPartition(consumerRecord.topic(), consumerRecord.partition())
-    val endForThisPartition = endOffsets[topicPartition]
+fun logProgressForPartition(consumerRecord: ConsumerRecord<String, String>, endOffsets: Map<TopicPartition, Long>) {
+    if (consumerRecord.offset() == 0L) {
+        log.info("Kafka-trace: Er på offset 0 for ${consumerRecord.topic()}-${consumerRecord.partition()}")
+    }
 
-    if(endForThisPartition != null && (endForThisPartition - 1) == consumerRecord.offset()) {
-        log.info("Kafka-trace: Er på endOffset for ${consumerRecord.topic()}-${consumerRecord.partition()}, med offset ${consumerRecord.offset()}. Endoffsets: $endOffsets")
+    if (endOffsets.isEmpty()) {
+        return
+    }
+
+    val topicPartition = TopicPartition(consumerRecord.topic(), consumerRecord.partition())
+    val endForThisPartition = endOffsets[topicPartition] ?: return
+
+    val oneQuarter = endForThisPartition / 4
+    val oneThird = endForThisPartition / 3
+    val halfwayPoint = endForThisPartition / 2
+    val twoThirds = (endForThisPartition / 3) * 2
+    val threeQuarters = (endForThisPartition / 4) * 3
+    val endPoint = endForThisPartition -1
+
+    when (consumerRecord.offset()) {
+        oneQuarter -> {
+            log.info("Kafka-trace: Er en fjerdedel på vei for ${consumerRecord.topic()}-${consumerRecord.partition()}, med offset ${consumerRecord.offset()}. Endoffsets: $endOffsets")
+        }
+        oneThird -> {
+            log.info("Kafka-trace: Er en tredjedel på vei for ${consumerRecord.topic()}-${consumerRecord.partition()}, med offset ${consumerRecord.offset()}. Endoffsets: $endOffsets")
+        }
+        halfwayPoint -> {
+            log.info("Kafka-trace: Er halvveis for ${consumerRecord.topic()}-${consumerRecord.partition()}, med offset ${consumerRecord.offset()}. Endoffsets: $endOffsets")
+        }
+        twoThirds -> {
+            log.info("Kafka-trace: Er to tredjedeler på vei for ${consumerRecord.topic()}-${consumerRecord.partition()}, med offset ${consumerRecord.offset()}. Endoffsets: $endOffsets")
+        }
+        threeQuarters -> {
+            log.info("Kafka-trace: Er tre fjerdedeler på vei for ${consumerRecord.topic()}-${consumerRecord.partition()}, med offset ${consumerRecord.offset()}. Endoffsets: $endOffsets")
+        }
+        endPoint -> {
+            log.info("Kafka-trace: Er på endOffset for ${consumerRecord.topic()}-${consumerRecord.partition()}, med offset ${consumerRecord.offset()}. Endoffsets: $endOffsets")
+        }
     }
 }
