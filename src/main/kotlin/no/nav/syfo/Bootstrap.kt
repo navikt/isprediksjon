@@ -87,33 +87,11 @@ fun launchListeners(
 ) {
     createListener(applicationState) {
         val kafkaConsumerSmReg = kafkaConsumers.kafkaConsumerSmReg
-        val alreadyResetPartitions = mutableListOf<TopicPartition>()
-
-        val subscriptionCallback = object : ConsumerRebalanceListener {
-            override fun onPartitionsAssigned(partitions: MutableCollection<TopicPartition>?) {
-                val wantedPartitions: Collection<TopicPartition> =
-                    partitions!!.filter { !alreadyResetPartitions.contains(it) }
-
-                if (wantedPartitions.isNotEmpty()) {
-                    log.info("Kafka-trace: Seek to beginning for partitions $wantedPartitions. We already have reset these partitions: $alreadyResetPartitions")
-                    kafkaConsumerSmReg.seekToBeginning(wantedPartitions)
-                } else {
-                    log.info("Kafka-trace: Didn't seek to beginning for any of candidates $partitions because we have them in alreadyReset list: $alreadyResetPartitions")
-                }
-
-                alreadyResetPartitions.addAll(wantedPartitions)
-            }
-
-            override fun onPartitionsRevoked(partitions: MutableCollection<TopicPartition>?) {}
-        }
 
         applicationState.ready = true
 
         log.info("Subscribing to topics: ${env.kafkaConsumerTopics}")
-        kafkaConsumerSmReg.subscribe(
-            env.kafkaConsumerTopics,
-            subscriptionCallback
-        )
+        kafkaConsumerSmReg.subscribe(env.kafkaConsumerTopics)
         blockingApplicationLogic(
             applicationState,
             database,
@@ -133,7 +111,7 @@ suspend fun blockingApplicationLogic(
     while (applicationState.ready) {
         val endOffsets = kafkaConsumer.endOffsets(kafkaConsumer.assignment())
         kafkaConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
-            handleReceivedMessage(database, env, consumerRecord, endOffsets)
+//            handleReceivedMessage(database, env, consumerRecord, endOffsets)
         }
         delay(100)
     }
