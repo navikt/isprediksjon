@@ -13,7 +13,6 @@ import no.nav.syfo.database.VaultCredentialService
 import no.nav.syfo.persistence.handleReceivedMessage
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.vault.RenewVaultService
-import org.apache.kafka.clients.consumer.ConsumerRebalanceListener
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
 import org.slf4j.Logger
@@ -109,10 +108,19 @@ suspend fun blockingApplicationLogic(
     kafkaConsumer: KafkaConsumer<String, String>
 ) {
     while (applicationState.ready) {
-        val endOffsets = kafkaConsumer.endOffsets(kafkaConsumer.assignment())
+        val endOffsets = endOffsetsOrEmptyMap(kafkaConsumer)
         kafkaConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
-//            handleReceivedMessage(database, env, consumerRecord, endOffsets)
+            handleReceivedMessage(database, env, consumerRecord, endOffsets)
         }
         delay(100)
+    }
+}
+
+fun endOffsetsOrEmptyMap(kafkaConsumer: KafkaConsumer<String, String>): Map<TopicPartition, Long> {
+    return try {
+        kafkaConsumer.endOffsets(kafkaConsumer.assignment())
+    } catch (e: Exception) {
+        log.info("Kafka-trace: Fikk feil ved henting av endOffsets, returnerer tom map", e.message)
+        emptyMap()
     }
 }

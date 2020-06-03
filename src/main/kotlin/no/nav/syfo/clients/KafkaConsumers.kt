@@ -12,7 +12,7 @@ import java.util.*
 class KafkaConsumers(env: Environment, vaultSecrets: KafkaCredentials) {
     private val kafkaBaseConfig = loadBaseConfig(env, vaultSecrets)
     private val properties = kafkaBaseConfig.toConsumerConfig(
-        "${env.applicationName}-consumer",
+        "${env.applicationName}-consumer2",
         valueDeserializer = StringDeserializer::class
     )
 
