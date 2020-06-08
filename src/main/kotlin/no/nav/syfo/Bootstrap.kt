@@ -108,19 +108,9 @@ suspend fun blockingApplicationLogic(
     kafkaConsumer: KafkaConsumer<String, String>
 ) {
     while (applicationState.ready) {
-        val endOffsets = endOffsetsOrEmptyMap(kafkaConsumer)
         kafkaConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
-            handleReceivedMessage(database, env, consumerRecord, endOffsets)
+            handleReceivedMessage(database, env, consumerRecord)
         }
         delay(100)
-    }
-}
-
-fun endOffsetsOrEmptyMap(kafkaConsumer: KafkaConsumer<String, String>): Map<TopicPartition, Long> {
-    return try {
-        kafkaConsumer.endOffsets(kafkaConsumer.assignment())
-    } catch (e: Exception) {
-        log.info("Kafka-trace: Fikk feil ved henting av endOffsets, returnerer tom map", e.message)
-        emptyMap()
     }
 }
