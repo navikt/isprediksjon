@@ -6,12 +6,11 @@ version = "1.0.0"
 
 val flywayVersion = "5.2.4"
 val hikariVersion = "3.3.0"
-val jacksonVersion = "2.9.7"
-val kafkaVersion = "2.0.0"
+val kafkaVersion = "2.3.1"
 val ktorVersion = "1.3.2"
 val logbackVersion = "1.2.3"
-val logstashEncoderVersion = "5.1"
-val postgresVersion = "42.2.5"
+val logstashEncoderVersion = "6.3"
+val postgresVersion = "42.2.13"
 val prometheusVersion = "0.6.0"
 val smCommonVersion = "1.0.22"
 val vaultJavaDriveVersion = "3.1.0"
@@ -30,7 +29,6 @@ dependencies {
     implementation(kotlin("stdlib"))
 
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
-    implementation("io.ktor:ktor-client-apache:$ktorVersion")
 
     implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     implementation("io.prometheus:simpleclient_common:$prometheusVersion")
@@ -42,10 +40,6 @@ dependencies {
     implementation("com.zaxxer:HikariCP:$hikariVersion")
     implementation("org.flywaydb:flyway-core:$flywayVersion")
     implementation("com.bettercloud:vault-java-driver:$vaultJavaDriveVersion")
-
-    implementation("com.fasterxml.jackson.module:jackson-module-jaxb-annotations:$jacksonVersion")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
 
     implementation("org.apache.kafka:kafka_2.12:$kafkaVersion")
     implementation("no.nav.syfo.sm:syfosm-common-kafka:$smCommonVersion")
