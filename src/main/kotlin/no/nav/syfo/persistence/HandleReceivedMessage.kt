@@ -14,6 +14,10 @@ fun handleReceivedMessage(
     env: Environment,
     consumerRecord: ConsumerRecord<String, String>
 ) {
+    if (consumerRecord.value() == null) {
+        log.warn("ConsumerRecord.value() er null, det er nok en tombstone! key ${consumerRecord.key()} fra topic: ${consumerRecord.topic()}, for partition ${consumerRecord.partition()} with offset ${consumerRecord.offset()} Ta kontakt med eier av topic hvis du tror dette er en feil!")
+        return
+    }
     try {
         when (consumerRecord.topic()) {
             env.sm2013ManuellBehandlingTopic -> {
