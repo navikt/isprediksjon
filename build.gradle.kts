@@ -11,7 +11,7 @@ val ktorVersion = "1.3.2"
 val logbackVersion = "1.2.3"
 val logstashEncoderVersion = "6.3"
 val postgresVersion = "42.2.13"
-val prometheusVersion = "0.6.0"
+val prometheusVersion = "0.8.1"
 val smCommonVersion = "1.0.22"
 val vaultJavaDriveVersion = "3.1.0"
 
