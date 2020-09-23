@@ -14,7 +14,6 @@ import no.nav.syfo.persistence.handleReceivedMessage
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.vault.RenewVaultService
 import org.apache.kafka.clients.consumer.KafkaConsumer
-import org.apache.kafka.common.TopicPartition
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.Duration
@@ -69,7 +68,8 @@ fun createListener(applicationState: ApplicationState, action: suspend Coroutine
         } catch (e: Exception) {
             log.error(
                 "En uhåndtert feil oppstod, applikasjonen restarter {}",
-                StructuredArguments.fields(e.message), e.cause
+                StructuredArguments.fields(e.message),
+                e.cause
             )
         } finally {
             applicationState.alive = false

@@ -1,6 +1,6 @@
 package no.nav.syfo.application
 
-import io.ktor.server.engine.ApplicationEngine
+import io.ktor.server.engine.*
 import java.util.concurrent.TimeUnit
 
 class ApplicationServer(
@@ -9,9 +9,11 @@ class ApplicationServer(
 ) {
 
     init {
-        Runtime.getRuntime().addShutdownHook(Thread {
-            this.applicationServer.stop(TimeUnit.SECONDS.toMillis(10), TimeUnit.SECONDS.toMillis(10))
-        })
+        Runtime.getRuntime().addShutdownHook(
+            Thread {
+                this.applicationServer.stop(TimeUnit.SECONDS.toMillis(10), TimeUnit.SECONDS.toMillis(10))
+            }
+        )
     }
 
     fun start() {

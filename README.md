@@ -17,6 +17,9 @@ Application written in Kotlin used to store sykmeldinger and extra info to be us
 To build locally and run the integration tests you can simply run `./gradlew shadowJar` or on windows 
 `gradlew.bat shadowJar`
 
+#### Lint
+Run `./gradlew --continue ktlintCheck`
+
 #### Creating a docker image
 Creating a docker image should be as simple as `docker build -t isprediksjon .`
 
