@@ -1,12 +1,11 @@
 package no.nav.syfo.persistence
 
-import io.ktor.util.KtorExperimentalAPI
+import io.ktor.util.*
 import no.nav.syfo.Environment
 import no.nav.syfo.database.Database
 import no.nav.syfo.log
 import no.nav.syfo.persistence.db.*
 import org.apache.kafka.clients.consumer.ConsumerRecord
-import org.apache.kafka.common.TopicPartition
 
 @KtorExperimentalAPI
 fun handleReceivedMessage(
