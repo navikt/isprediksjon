@@ -5,14 +5,13 @@ Application written in Kotlin used to store sykmeldinger and extra info to be us
 * Kotlin
 * Ktor
 * Gradle
-* JDK 12
+* JDK 11
 * Spek
 * Jackson
 
 #### Requirements
 
-* JDK 12
-
+* JDK 11
 
 #### Build and run tests
 To build locally and run the integration tests you can simply run `./gradlew shadowJar` or on windows 
