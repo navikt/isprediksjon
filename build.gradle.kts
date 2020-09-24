@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 group = "no.nav.syfo"
 version = "1.0.0"
 
+val coroutinesVersion = "1.3.9"
 val flywayVersion = "6.4.4"
 val hikariVersion = "3.3.0"
 val kafkaVersion = "2.3.1"
@@ -15,7 +16,7 @@ val prometheusVersion = "0.8.1"
 val vaultJavaDriveVersion = "3.1.0"
 
 plugins {
-    kotlin("jvm") version "1.3.72"
+    kotlin("jvm") version "1.4.10"
     id("com.github.johnrengelman.shadow") version "5.2.0"
     id("org.jlleitschuh.gradle.ktlint") version "9.4.0"
 }
@@ -23,12 +24,16 @@ plugins {
 repositories {
     mavenCentral()
     jcenter()
+    maven(url = "https://dl.bintray.com/kotlin/kotlinx/")
 }
 
 dependencies {
     implementation(kotlin("stdlib"))
 
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:$coroutinesVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
 
     implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
     implementation("io.prometheus:simpleclient_common:$prometheusVersion")
