@@ -9,11 +9,16 @@ object Versions {
     const val flywayVersion = "6.4.4"
     const val hikariVersion = "3.3.0"
     const val kafkaVersion = "2.3.1"
+    const val kafkaEmbeddedVersion = "2.4.0"
+    const val kluentVersion = "1.61"
     const val ktorVersion = "1.3.2"
     const val logbackVersion = "1.2.3"
     const val logstashEncoderVersion = "6.3"
+    const val mockkVersion = "1.10.0"
     const val postgresVersion = "42.2.13"
+    const val postgresTestContainersVersion = "1.14.3"
     const val prometheusVersion = "0.8.1"
+    const val spekVersion = "2.0.12"
     const val vaultJavaDriveVersion = "3.1.0"
 }
 
@@ -26,6 +31,7 @@ plugins {
 repositories {
     mavenCentral()
     jcenter()
+    maven(url = "https://packages.confluent.io/maven/")
 }
 
 dependencies {
@@ -47,8 +53,15 @@ dependencies {
     implementation("com.zaxxer:HikariCP:${Versions.hikariVersion}")
     implementation("org.flywaydb:flyway-core:${Versions.flywayVersion}")
     implementation("com.bettercloud:vault-java-driver:${Versions.vaultJavaDriveVersion}")
+    testImplementation("org.testcontainers:postgresql:${Versions.postgresTestContainersVersion}")
 
     implementation("org.apache.kafka:kafka_2.12:${Versions.kafkaVersion}")
+    testImplementation("no.nav:kafka-embedded-env:${Versions.kafkaEmbeddedVersion}")
+
+    testImplementation("org.amshove.kluent:kluent:${Versions.kluentVersion}")
+    testImplementation("io.ktor:ktor-server-test-host:${Versions.ktorVersion}")
+    testImplementation("io.mockk:mockk:${Versions.mockkVersion}")
+    testImplementation("org.spekframework.spek2:spek-dsl-jvm:${Versions.spekVersion}")
 }
 
 tasks {
