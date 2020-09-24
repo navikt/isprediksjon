@@ -12,7 +12,6 @@ val logbackVersion = "1.2.3"
 val logstashEncoderVersion = "6.3"
 val postgresVersion = "42.2.13"
 val prometheusVersion = "0.8.1"
-val smCommonVersion = "1.0.22"
 val vaultJavaDriveVersion = "3.1.0"
 
 plugins {
@@ -43,7 +42,6 @@ dependencies {
     implementation("com.bettercloud:vault-java-driver:$vaultJavaDriveVersion")
 
     implementation("org.apache.kafka:kafka_2.12:$kafkaVersion")
-    implementation("no.nav.syfo.sm:syfosm-common-kafka:$smCommonVersion")
 }
 
 tasks {
