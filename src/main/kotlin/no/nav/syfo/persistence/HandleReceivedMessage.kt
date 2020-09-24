@@ -2,14 +2,14 @@ package no.nav.syfo.persistence
 
 import io.ktor.util.*
 import no.nav.syfo.Environment
-import no.nav.syfo.database.Database
+import no.nav.syfo.database.DatabaseInterface
 import no.nav.syfo.log
 import no.nav.syfo.persistence.db.*
 import org.apache.kafka.clients.consumer.ConsumerRecord
 
 @KtorExperimentalAPI
 fun handleReceivedMessage(
-    database: Database,
+    database: DatabaseInterface,
     env: Environment,
     consumerRecord: ConsumerRecord<String, String>
 ) {

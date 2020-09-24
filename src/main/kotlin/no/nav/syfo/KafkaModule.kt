@@ -6,14 +6,13 @@ import kotlinx.coroutines.*
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.clients.KafkaConsumers
-import no.nav.syfo.database.Database
+import no.nav.syfo.database.DatabaseInterface
 import no.nav.syfo.persistence.handleReceivedMessage
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import java.time.Duration
 
 fun Application.kafkaModule(
     applicationState: ApplicationState,
-    database: Database,
     env: Environment,
     vaultSecrets: VaultSecrets
 ) {
@@ -32,7 +31,7 @@ fun Application.kafkaModule(
 @KtorExperimentalAPI
 suspend fun launchListeners(
     applicationState: ApplicationState,
-    database: Database,
+    database: DatabaseInterface,
     env: Environment,
     kafkaConsumers: KafkaConsumers
 ) {
@@ -68,7 +67,7 @@ suspend fun createListener(applicationState: ApplicationState, action: suspend C
 @KtorExperimentalAPI
 suspend fun blockingApplicationLogic(
     applicationState: ApplicationState,
-    database: Database,
+    database: DatabaseInterface,
     env: Environment,
     kafkaConsumer: KafkaConsumer<String, String>
 ) {
