@@ -51,11 +51,12 @@ fun main() {
             applicationState.alive = true
 
             module {
+                serverModule(applicationState)
                 databaseModule(
+                    applicationState,
                     env,
                     vaultCredentialService
                 )
-                serverModule(applicationState)
                 kafkaModule(
                     applicationState,
                     env,

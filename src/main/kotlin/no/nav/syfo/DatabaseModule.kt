@@ -1,10 +1,12 @@
 package no.nav.syfo
 
 import io.ktor.application.*
+import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.database.*
 
 lateinit var database: DatabaseInterface
 fun Application.databaseModule(
+    applicationState: ApplicationState,
     env: Environment,
     vaultCredentialService: VaultCredentialService
 ) {
@@ -33,5 +35,7 @@ fun Application.databaseModule(
             RenewCredentialsTaskData(env.databaseMountPathVault, env.databaseName, Role.USER) {
                 prodDatabase.updateCredentials(username = it.username, password = it.password)
             }
+
+        applicationState.ready = true
     }
 }
