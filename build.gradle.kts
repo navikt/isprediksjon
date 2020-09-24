@@ -4,16 +4,18 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransf
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val coroutinesVersion = "1.3.9"
-val flywayVersion = "6.4.4"
-val hikariVersion = "3.3.0"
-val kafkaVersion = "2.3.1"
-val ktorVersion = "1.3.2"
-val logbackVersion = "1.2.3"
-val logstashEncoderVersion = "6.3"
-val postgresVersion = "42.2.13"
-val prometheusVersion = "0.8.1"
-val vaultJavaDriveVersion = "3.1.0"
+object Versions {
+    const val coroutinesVersion = "1.3.9"
+    const val flywayVersion = "6.4.4"
+    const val hikariVersion = "3.3.0"
+    const val kafkaVersion = "2.3.1"
+    const val ktorVersion = "1.3.2"
+    const val logbackVersion = "1.2.3"
+    const val logstashEncoderVersion = "6.3"
+    const val postgresVersion = "42.2.13"
+    const val prometheusVersion = "0.8.1"
+    const val vaultJavaDriveVersion = "3.1.0"
+}
 
 plugins {
     kotlin("jvm") version "1.4.10"
@@ -30,23 +32,23 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
 
-    implementation("io.ktor:ktor-server-netty:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty:${Versions.ktorVersion}")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:$coroutinesVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:${Versions.coroutinesVersion}")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutinesVersion}")
 
-    implementation("io.prometheus:simpleclient_hotspot:$prometheusVersion")
-    implementation("io.prometheus:simpleclient_common:$prometheusVersion")
+    implementation("io.prometheus:simpleclient_hotspot:${Versions.prometheusVersion}")
+    implementation("io.prometheus:simpleclient_common:${Versions.prometheusVersion}")
 
-    implementation("ch.qos.logback:logback-classic:$logbackVersion")
-    implementation("net.logstash.logback:logstash-logback-encoder:$logstashEncoderVersion")
+    implementation("ch.qos.logback:logback-classic:${Versions.logbackVersion}")
+    implementation("net.logstash.logback:logstash-logback-encoder:${Versions.logstashEncoderVersion}")
 
-    implementation("org.postgresql:postgresql:$postgresVersion")
-    implementation("com.zaxxer:HikariCP:$hikariVersion")
-    implementation("org.flywaydb:flyway-core:$flywayVersion")
-    implementation("com.bettercloud:vault-java-driver:$vaultJavaDriveVersion")
+    implementation("org.postgresql:postgresql:${Versions.postgresVersion}")
+    implementation("com.zaxxer:HikariCP:${Versions.hikariVersion}")
+    implementation("org.flywaydb:flyway-core:${Versions.flywayVersion}")
+    implementation("com.bettercloud:vault-java-driver:${Versions.vaultJavaDriveVersion}")
 
-    implementation("org.apache.kafka:kafka_2.12:$kafkaVersion")
+    implementation("org.apache.kafka:kafka_2.12:${Versions.kafkaVersion}")
 }
 
 tasks {
