@@ -1,7 +1,6 @@
 package no.nav.syfo.database
 
 import com.bettercloud.vault.VaultException
-import com.zaxxer.hikari.HikariDataSource
 import kotlinx.coroutines.delay
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.log
@@ -20,11 +19,7 @@ class VaultCredentialService {
                     databaseName,
                     role
                 )
-                dataSource.apply {
-                    hikariConfigMXBean.setUsername(credentials.username)
-                    hikariConfigMXBean.setPassword(credentials.password)
-                    hikariPoolMXBean.softEvictConnections()
-                }
+                cb(credentials)
             }
             delay(Vault.suggestedRefreshIntervalInMillis(leaseDuration * 1000))
         }
@@ -51,10 +46,10 @@ class VaultCredentialService {
 }
 
 data class RenewCredentialsTaskData(
-    val dataSource: HikariDataSource,
     val mountPath: String,
     val databaseName: String,
-    val role: Role
+    val role: Role,
+    val cb: (credentials: VaultCredentials) -> Unit
 )
 
 data class VaultCredentials(

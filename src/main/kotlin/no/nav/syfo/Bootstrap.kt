@@ -8,7 +8,6 @@ import io.ktor.util.*
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.slf4j.MDCContext
 import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.database.Database
 import no.nav.syfo.database.VaultCredentialService
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.vault.RenewVaultService
@@ -51,13 +50,14 @@ fun main() {
 
             applicationState.alive = true
 
-            val database = Database(env, vaultCredentialService)
-
             module {
+                databaseModule(
+                    env,
+                    vaultCredentialService
+                )
                 serverModule(applicationState)
                 kafkaModule(
                     applicationState,
-                    database,
                     env,
                     vaultSecrets
                 )

@@ -2,8 +2,7 @@ package no.nav.syfo.database
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import no.nav.syfo.Environment
-import no.nav.syfo.log
+
 import org.flywaydb.core.Flyway
 import java.sql.Connection
 
@@ -13,54 +12,66 @@ enum class Role {
     override fun toString() = name.toLowerCase()
 }
 
-class Database(private val env: Environment, private val vaultCredentialService: VaultCredentialService) :
+data class DbConfig(
+    val jdbcUrl: String,
+    val password: String,
+    val username: String,
+    val databaseName: String,
+    val poolSize: Int = 2,
+    val runMigrationsOninit: Boolean = true
+)
+
+class ProdDatabase(dbConfig: DbConfig, initBlock: (context: Database) -> Unit) : Database(dbConfig, initBlock) {
+
+    override fun runFlywayMigrations(jdbcUrl: String, username: String, password: String): Int =
+        Flyway.configure().run {
+            dataSource(jdbcUrl, username, password)
+            initSql("SET ROLE \"${dbConfig.databaseName}-${Role.ADMIN}\"") // required for assigning proper owners for the tables
+            load().migrate()
+        }
+}
+
+abstract class Database(val dbConfig: DbConfig, private val initBlock: ((context: Database) -> Unit)?) :
     DatabaseInterface {
-    private val dataSource: HikariDataSource
+
+    private var dataSource: HikariDataSource = HikariDataSource(
+        HikariConfig().apply {
+            jdbcUrl = dbConfig.jdbcUrl
+            username = dbConfig.username
+            password = dbConfig.password
+            maximumPoolSize = dbConfig.poolSize
+            minimumIdle = 1
+            isAutoCommit = false
+            transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+            validate()
+        }
+    )
+
+    init {
+
+        afterInit()
+    }
+
+    fun updateCredentials(username: String, password: String) {
+        dataSource.apply {
+            hikariConfigMXBean.setPassword(password)
+            hikariConfigMXBean.setUsername(username)
+            hikariPoolMXBean.softEvictConnections()
+        }
+    }
 
     override val connection: Connection
         get() = dataSource.connection
 
-    init {
-        runFlywayMigrations()
-
-        val initialCredentials = vaultCredentialService.getNewCredentials(
-            mountPath = env.databaseMountPathVault,
-            databaseName = env.databaseName,
-            role = Role.USER
-        )
-        dataSource = HikariDataSource(
-            HikariConfig().apply {
-                jdbcUrl = env.isprediksjonDBURL
-                username = initialCredentials.username
-                password = initialCredentials.password
-                maximumPoolSize = 3
-                minimumIdle = 1
-                idleTimeout = 10001
-                maxLifetime = 300000
-                isAutoCommit = false
-                transactionIsolation = "TRANSACTION_REPEATABLE_READ"
-                validate()
-            }
-        )
-
-        vaultCredentialService.renewCredentialsTaskData = RenewCredentialsTaskData(
-            dataSource = dataSource,
-            mountPath = env.databaseMountPathVault,
-            databaseName = env.databaseName,
-            role = Role.USER
-        )
+    private fun afterInit() {
+        if (dbConfig.runMigrationsOninit) {
+            runFlywayMigrations(dbConfig.jdbcUrl, dbConfig.username, dbConfig.password)
+        }
+        initBlock?.let { run(it) }
     }
 
-    private fun runFlywayMigrations() = Flyway.configure().run {
-        log.info("Run flyway migrations")
-        val credentials = vaultCredentialService.getNewCredentials(
-            mountPath = env.databaseMountPathVault,
-            databaseName = env.databaseName,
-            role = Role.ADMIN
-        )
-        dataSource(env.isprediksjonDBURL, credentials.username, credentials.password)
-        // required for assigning proper owners for the tables
-        initSql("SET ROLE \"${env.databaseName}-${Role.ADMIN}\"")
+    open fun runFlywayMigrations(jdbcUrl: String, username: String, password: String) = Flyway.configure().run {
+        dataSource(jdbcUrl, username, password)
         load().migrate()
     }
 }
