@@ -1,5 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "no.nav.syfo"
 version = "1.0.0"
@@ -62,6 +63,8 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:${Versions.ktorVersion}")
     testImplementation("io.mockk:mockk:${Versions.mockkVersion}")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:${Versions.spekVersion}")
+    testRuntimeOnly("org.spekframework.spek2:spek-runtime-jvm:${Versions.spekVersion}")
+    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:${Versions.spekVersion}")
 }
 
 tasks {
@@ -75,7 +78,7 @@ tasks {
         }
     }
 
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    withType<KotlinCompile> {
         kotlinOptions.jvmTarget = "11"
     }
 
@@ -87,9 +90,9 @@ tasks {
     }
 
     withType<Test> {
-        useJUnit()
-        testLogging {
-            showStandardStreams = true
+        useJUnitPlatform {
+            includeEngines("spek2")
         }
+        testLogging.showStandardStreams = true
     }
 }

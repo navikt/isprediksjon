@@ -5,10 +5,7 @@ import io.ktor.util.*
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.unmockkAll
-import kotlinx.coroutines.launch
 import no.nav.common.KafkaEnvironment
-import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.blockingApplicationLogic
 import no.nav.syfo.clients.kafkaConsumerProperties
 import org.amshove.kluent.shouldBeEqualTo
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -70,12 +67,12 @@ object HandleReceivedMessageSpek : Spek({
             }
 
             describe("Read and store message from ${env.sm2013ManuellBehandlingTopic}") {
-                val sykmeldingData = "sykmelding"
+                val sykmeldingData = "{\"name\": \"Sykmelding\"}"
                 val sykmeldingRecord = ConsumerRecord(
                     env.sm2013ManuellBehandlingTopic,
                     partition,
                     1,
-                    "something",
+                    "2ac48dec-ff0a-11ea-adc1-0242ac120002",
                     sykmeldingData
                 )
 
@@ -85,27 +82,15 @@ object HandleReceivedMessageSpek : Spek({
                 )
 
                 it("should store") {
-                    launch {
-                        blockingApplicationLogic(
-                            applicationState = ApplicationState(
-                                alive = true,
-                                ready = true
-                            ),
-                            database = database,
-                            env = env,
-                            kafkaConsumer = mockConsumer
-                        )
+                    mockConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
+                        handleReceivedMessage(database, env, consumerRecord)
                     }
 
-                    val sykmeldingRecordId = sykmeldingRecord.key()
+                    val sykmeldingRecordId: String = sykmeldingRecord.key()
 
-                    val sykmeldingListe: List<Any> = database.connection.getSmManuellBehandling(sykmeldingRecordId)
+                    val sykmeldingListe: List<String> = database.connection.getSmManuellBehandling(sykmeldingRecordId)
 
                     sykmeldingListe.size shouldBeEqualTo 1
-
-                    val sykmeldingStoredId = sykmeldingListe.first()
-
-                    sykmeldingStoredId shouldBeEqualTo sykmeldingRecordId
                 }
             }
         }
