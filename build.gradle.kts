@@ -31,6 +31,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
+    implementation(kotlin("reflect"))
 
     implementation("io.ktor:ktor-server-netty:${Versions.ktorVersion}")
 
