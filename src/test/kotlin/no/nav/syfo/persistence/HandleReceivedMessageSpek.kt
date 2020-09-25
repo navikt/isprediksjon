@@ -8,23 +8,47 @@ import io.mockk.unmockkAll
 import no.nav.common.KafkaEnvironment
 import no.nav.syfo.clients.kafkaConsumerProperties
 import org.amshove.kluent.shouldBeEqualTo
-import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.common.TopicPartition
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import testutil.*
+import testutil.generator.generateSykmeldingRecord
 import java.time.Duration
 
 @InternalAPI
 object HandleReceivedMessageSpek : Spek({
-    val topicName = "topic1"
+    data class TopicTable(
+        val topic: String,
+        val table: String
+    )
+
+    val sm2013ManuellBehandlingTopic = "topic1"
+    val sm2013AutomatiskBehandlingTopic = "topic2"
+    val smregisterRecievedSykmeldingBackupTopic = "topic3"
+    val sm2013BehandlingsutfallTopic = "topic4"
+    val smregisterBehandlingsutfallBackupTopic = "topic5"
+    val syfoSykmeldingstatusLeesahTopic = "topic6"
+    val syfoRegisterStatusBackupTopic = "topic7"
+
+    val topicTableList = listOf(
+        TopicTable(sm2013ManuellBehandlingTopic, "smManuellBehandling"),
+        TopicTable(sm2013AutomatiskBehandlingTopic, "smAutomatiskBehandling"),
+        TopicTable(smregisterRecievedSykmeldingBackupTopic, "smHist"),
+        TopicTable(sm2013BehandlingsutfallTopic, "smBehandlingsutfall"),
+        TopicTable(smregisterBehandlingsutfallBackupTopic, "smBehandlingsutfallHist"),
+        TopicTable(syfoSykmeldingstatusLeesahTopic, "smSykmeldingstatus"),
+        TopicTable(syfoRegisterStatusBackupTopic, "smSykmeldingstatusHist")
+    )
+    val topicList = topicTableList.map {
+        it.topic
+    }
 
     val embeddedEnvironment = KafkaEnvironment(
         autoStart = false,
         withSchemaRegistry = false,
-        topicNames = listOf(topicName)
+        topicNames = topicList
     )
 
     val env = testEnvironment(
@@ -45,7 +69,6 @@ object HandleReceivedMessageSpek : Spek({
     }
 
     describe("HandleReceivedMessage") {
-
         with(TestApplicationEngine()) {
             start()
 
@@ -56,41 +79,34 @@ object HandleReceivedMessageSpek : Spek({
                     put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer")
                     put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer")
                 }
-            val consumerOversikthendelse = KafkaConsumer<String, String>(consumerPropertiesOversikthendelse)
-            consumerOversikthendelse.subscribe(listOf(topicName))
+            val kafkaConsumerSykmelding = KafkaConsumer<String, String>(consumerPropertiesOversikthendelse)
+            kafkaConsumerSykmelding.subscribe(topicList)
 
             val partition = 0
-            val sykmeldingTopicPartition = TopicPartition(env.sm2013ManuellBehandlingTopic, partition)
+            val sykmeldingTopicPartition = TopicPartition(env.sm2013AutomatiskBehandlingTopic, partition)
 
-            afterEachTest {
-                database.connection.dropData()
-            }
-
-            describe("Read and store message from ${env.sm2013ManuellBehandlingTopic}") {
-                val sykmeldingData = "{\"name\": \"Sykmelding\"}"
-                val sykmeldingRecord = ConsumerRecord(
-                    env.sm2013ManuellBehandlingTopic,
-                    partition,
-                    1,
-                    "2ac48dec-ff0a-11ea-adc1-0242ac120002",
-                    sykmeldingData
-                )
-
-                val mockConsumer = mockk<KafkaConsumer<String, String>>()
-                every { mockConsumer.poll(Duration.ofMillis(0)) } returns ConsumerRecords(
-                    mapOf(sykmeldingTopicPartition to listOf(sykmeldingRecord))
-                )
-
-                it("should store") {
-                    mockConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
-                        handleReceivedMessage(database, env, consumerRecord)
+            topicTableList.forEach {
+                describe("Read and store message from ${it.topic}") {
+                    val table = it.table
+                    afterEachTest {
+                        database.connection.dropData(table)
                     }
 
-                    val sykmeldingRecordId: String = sykmeldingRecord.key()
+                    val sykmeldingRecord = generateSykmeldingRecord(it.topic)
 
-                    val sykmeldingListe: List<String> = database.connection.getSmManuellBehandling(sykmeldingRecordId)
+                    val mockConsumer = mockk<KafkaConsumer<String, String>>()
+                    every { mockConsumer.poll(Duration.ofMillis(0)) } returns ConsumerRecords(
+                        mapOf(sykmeldingTopicPartition to listOf(sykmeldingRecord))
+                    )
 
-                    sykmeldingListe.size shouldBeEqualTo 1
+                    it("should store data from record") {
+                        mockConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
+                            handleReceivedMessage(database, env, consumerRecord)
+                        }
+
+                        val sykmeldingListe: List<String> = database.connection.getSM(table, sykmeldingRecord.key())
+                        sykmeldingListe.size shouldBeEqualTo 1
+                    }
                 }
             }
         }

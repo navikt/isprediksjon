@@ -39,24 +39,29 @@ class TestDB : DatabaseInterface {
     }
 }
 
-fun Connection.dropData() {
-    val query = "DELETE FROM smManuellBehandling"
+fun Connection.dropData(table: String) {
+    val query = "DELETE FROM $table"
     use { connection ->
         connection.prepareStatement(query).executeUpdate()
         connection.commit()
     }
 }
 
-const val queryGetSmManuellBehandling =
-    """
+fun querySykmelding(table: String): String {
+    return """
     SELECT *
-    FROM smManuellBehandling
+    FROM $table
     WHERE sykmelding_id = ?
     """
+}
 
-fun Connection.getSmManuellBehandling(sykmeldingId: String): List<String> {
+fun Connection.getSM(
+    table: String,
+    sykmeldingId: String
+): List<String> {
+
     return use { connection ->
-        connection.prepareStatement(queryGetSmManuellBehandling).use {
+        connection.prepareStatement(querySykmelding(table)).use {
             it.setString(1, sykmeldingId)
             it.executeQuery().toList {
                 toSmManuellBehandlingId()
