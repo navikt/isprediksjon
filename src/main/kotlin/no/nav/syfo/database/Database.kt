@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource
 
 import org.flywaydb.core.Flyway
 import java.sql.Connection
+import java.sql.ResultSet
 
 enum class Role {
     ADMIN, USER, READONLY;
@@ -73,6 +74,12 @@ abstract class Database(val dbConfig: DbConfig, private val initBlock: ((context
     open fun runFlywayMigrations(jdbcUrl: String, username: String, password: String) = Flyway.configure().run {
         dataSource(jdbcUrl, username, password)
         load().migrate()
+    }
+}
+
+fun <T> ResultSet.toList(mapper: ResultSet.() -> T) = mutableListOf<T>().apply {
+    while (next()) {
+        add(mapper())
     }
 }
 
