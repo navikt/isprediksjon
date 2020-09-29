@@ -4,9 +4,12 @@ import no.nav.syfo.database.Database
 import no.nav.syfo.database.DatabaseInterface
 import no.nav.syfo.database.DbConfig
 import no.nav.syfo.database.toList
+import no.nav.syfo.domain.Fodselsnummer
+import no.nav.syfo.prediksjon.input.PPrediksjonInput
 import org.testcontainers.containers.PostgreSQLContainer
 import java.sql.Connection
 import java.sql.ResultSet
+import java.time.LocalDate
 
 class DevDatabase(dbConfig: DbConfig) : Database(dbConfig, null)
 
@@ -71,3 +74,34 @@ fun Connection.getSM(
 }
 
 fun ResultSet.toSmManuellBehandlingId(): String = getString("sykmelding_id")
+
+const val queryGetPrediksjonInput =
+    """
+    SELECT *
+    FROM prediksjon_input
+    WHERE fnr = ?
+    """
+
+fun Connection.getPrediksjonInput(
+    fnr: Fodselsnummer
+): List<PPrediksjonInput> {
+    return use { connection ->
+        connection.prepareStatement(queryGetPrediksjonInput).use {
+            it.setString(1, fnr.value)
+            it.executeQuery().toList {
+                toPPrediksjonInput()
+            }
+        }
+    }
+}
+
+fun ResultSet.toPPrediksjonInput(): PPrediksjonInput =
+    PPrediksjonInput(
+        id = getInt("id"),
+        uuid = getString("uuid"),
+        fnr = getString("fnr"),
+        aktorId = getString("aktorid"),
+        tilfelleStartDate = getObject("tilfelle_start_date", LocalDate::class.java),
+        tilfelleEndDate = getObject("tilfelle_end_date", LocalDate::class.java),
+        created = getTimestamp("created").toLocalDateTime()
+    )
