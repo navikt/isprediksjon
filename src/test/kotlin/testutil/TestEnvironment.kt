@@ -18,7 +18,10 @@ fun testEnvironment(port: Int, kafkaBootstrapServers: String) = Environment(
     syfoRegisterStatusBackupTopic = "topic7",
     databaseMountPathVault = "vault.adeo.no",
     databaseName = "isprediksjon",
-    isprediksjonDBURL = "12314.adeo.no"
+    isprediksjonDBURL = "12314.adeo.no",
+    aktorregisterV1Url = "http://aktorregister",
+    stsRestUrl = "http://stsrest",
+    syketilfelleUrl = "http://syfosyketilfelle"
 )
 
 val vaultSecrets = VaultSecrets(

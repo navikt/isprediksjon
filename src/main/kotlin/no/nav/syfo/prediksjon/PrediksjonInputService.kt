@@ -1,12 +1,12 @@
 package no.nav.syfo.prediksjon
 
 import no.nav.syfo.database.DatabaseInterface
-import no.nav.syfo.prediksjon.input.PPrediksjonInput
+import no.nav.syfo.oppfolgingstilfelle.domain.PersonOppfolgingstilfelle
 
 class PrediksjonInputService(
     private val database: DatabaseInterface
 ) {
-    fun createPrediksjonInput(pPrediksjonInput: PPrediksjonInput) {
-        database.createPrediksjonInput(pPrediksjonInput)
+    fun createPrediksjonInput(personOppfolgingstilfelle: PersonOppfolgingstilfelle) {
+        database.createPrediksjonInput(personOppfolgingstilfelle)
     }
 }
