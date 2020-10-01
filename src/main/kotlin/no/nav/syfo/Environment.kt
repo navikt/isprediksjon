@@ -17,6 +17,9 @@ data class Environment(
     val databaseMountPathVault: String = getEnvVar("DATABASE_MOUNT_PATH_VAULT"),
     val databaseName: String = getEnvVar("DATABASE_NAME", "isprediksjon"),
     val isprediksjonDBURL: String = getEnvVar("ISPREDIKSJON_DB_URL"),
+    val aktorregisterV1Url: String = getEnvVar("AKTORREGISTER_V1_URL", "https://app.adeo.no/aktoerregister/api/v1"),
+    val stsRestUrl: String = getEnvVar("SECURITY_TOKEN_SERVICE_REST_URL", "https://security-token-service.nais.adeo.no"),
+    val syketilfelleUrl: String = getEnvVar("SYFOSYKETILFELLE_URL", "http://syfosyketilfelle"),
 
     val developmentMode: Boolean = getEnvVar("DEVELOPMENT_MODE", "false").toBoolean()
 )

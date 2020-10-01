@@ -6,9 +6,12 @@ group = "no.nav.syfo"
 version = "1.0.0"
 
 object Versions {
+    const val arrowVersion = "0.9.0"
     const val coroutinesVersion = "1.3.9"
     const val flywayVersion = "6.4.4"
+    const val fuelVersion = "1.15.1"
     const val hikariVersion = "3.3.0"
+    const val jacksonVersion = "2.9.8"
     const val kafkaVersion = "2.3.1"
     const val kafkaEmbeddedVersion = "2.4.0"
     const val kluentVersion = "1.61"
@@ -16,6 +19,7 @@ object Versions {
     const val logbackVersion = "1.2.3"
     const val logstashEncoderVersion = "6.3"
     const val mockkVersion = "1.10.0"
+    const val orgJsonVersion = "20180813"
     const val postgresVersion = "42.2.13"
     const val postgresTestContainersVersion = "1.14.3"
     const val prometheusVersion = "0.8.1"
@@ -58,6 +62,14 @@ dependencies {
 
     implementation("org.apache.kafka:kafka_2.12:${Versions.kafkaVersion}")
     testImplementation("no.nav:kafka-embedded-env:${Versions.kafkaEmbeddedVersion}")
+
+    implementation("com.fasterxml.jackson.core:jackson-databind:${Versions.jacksonVersion}")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${Versions.jacksonVersion}")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jacksonVersion}")
+
+    implementation("org.json:json:${Versions.orgJsonVersion}")
+    implementation("com.github.kittinunf.fuel:fuel:${Versions.fuelVersion}")
+    implementation("io.arrow-kt:arrow-core-data:${Versions.arrowVersion}")
 
     testImplementation("org.amshove.kluent:kluent:${Versions.kluentVersion}")
     testImplementation("io.ktor:ktor-server-test-host:${Versions.ktorVersion}")

@@ -63,3 +63,9 @@ spec:
       value: isprediksjon
     - name: ISPREDIKSJON_DB_URL
       value: jdbc:postgresql://A01DBVL013.adeo.no:5432/isprediksjon
+    - name: AKTORREGISTER_V1_URL
+      value: "https://app.adeo.no/aktoerregister/api/v1"
+    - name: SECURITY_TOKEN_SERVICE_REST_URL
+      value: "https://security-token-service.nais.adeo.no"
+    - name: SYFOSYKETILFELLE_URL
+      value: "https://syfosyketilfelle.nais.adeo.no"

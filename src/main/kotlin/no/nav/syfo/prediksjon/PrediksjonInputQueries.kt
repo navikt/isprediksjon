@@ -2,7 +2,7 @@ package no.nav.syfo.prediksjon
 
 import no.nav.syfo.database.DatabaseInterface
 import no.nav.syfo.database.toList
-import no.nav.syfo.prediksjon.input.PPrediksjonInput
+import no.nav.syfo.oppfolgingstilfelle.domain.PersonOppfolgingstilfelle
 import java.sql.SQLException
 import java.sql.Timestamp
 import java.time.Instant
@@ -22,7 +22,7 @@ const val queryCreatePrediksjonInput =
     """
 
 fun DatabaseInterface.createPrediksjonInput(
-    pPrediksjonInput: PPrediksjonInput
+    personOppfolgingstilfelle: PersonOppfolgingstilfelle
 ): Pair<Int, UUID> {
     val uuid = UUID.randomUUID().toString()
     val now = Timestamp.from(Instant.now())
@@ -30,10 +30,10 @@ fun DatabaseInterface.createPrediksjonInput(
     connection.use { connection ->
         val idList = connection.prepareStatement(queryCreatePrediksjonInput).use {
             it.setString(1, uuid)
-            it.setString(2, pPrediksjonInput.fnr)
-            it.setString(3, pPrediksjonInput.aktorId)
-            it.setObject(4, pPrediksjonInput.tilfelleStartDate)
-            it.setObject(5, pPrediksjonInput.tilfelleEndDate)
+            it.setString(2, personOppfolgingstilfelle.fnr.value)
+            it.setString(3, personOppfolgingstilfelle.aktorId.value)
+            it.setObject(4, personOppfolgingstilfelle.tilfelleStartDate)
+            it.setObject(5, personOppfolgingstilfelle.tilfelleEndDate)
             it.setTimestamp(6, now)
             it.executeQuery().toList { getInt("id") }
         }
