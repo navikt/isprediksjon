@@ -28,6 +28,7 @@ import testutil.UserConstants.ARBEIDSTAKER_AKTORID
 import testutil.UserConstants.ARBEIDSTAKER_FNR
 import testutil.generator.generateKOppfolgingstilfelle
 import testutil.generator.generateKOppfolgingstilfellePeker
+import testutil.mock.mockStsRestServer
 import testutil.mock.mockSyketilfelleServer
 import java.net.ServerSocket
 
@@ -40,18 +41,6 @@ data class RSIdent(
 data class RSAktor(
     val identer: List<RSIdent>? = null,
     val feilmelding: String? = null
-)
-
-data class OidcToken(
-    val access_token: String,
-    val expires_in: Long,
-    val token_type: String
-)
-
-private val defaultToken = OidcToken(
-    access_token = "default access token",
-    expires_in = 3600,
-    token_type = "Bearer"
 )
 
 @InternalAPI
@@ -86,6 +75,12 @@ object OppfolgingstilfelleServiceSpek : Spek({
             kOppfolgingstilfelleJson
         ).start()
 
+        val stsRestServerPort = getRandomPort()
+        val stsRestServerUrl = "http://localhost:$stsRestServerPort"
+        val stsRestServer = mockStsRestServer(
+            stsRestServerPort
+        ).start()
+
         val mockHttpServerPort = ServerSocket(0).use { it.localPort }
         val mockHttpServerUrl = "http://localhost:$mockHttpServerPort"
         val mockServer = embeddedServer(Netty, mockHttpServerPort) {
@@ -93,12 +88,6 @@ object OppfolgingstilfelleServiceSpek : Spek({
                 jackson {}
             }
             routing {
-                get("/rest/v1/sts/token") {
-                    val params = call.request.queryParameters
-                    if (params["grant_type"].equals("client_credentials") && params["scope"].equals("openid")) {
-                        call.respond(defaultToken)
-                    }
-                }
                 get("/${env.aktorregisterV1Url}/identer") {
                     when (call.request.headers[NAV_PERSONIDENTER]) {
                         ARBEIDSTAKER_AKTORID.value -> {
@@ -129,7 +118,7 @@ object OppfolgingstilfelleServiceSpek : Spek({
         }.start()
 
         val stsRestClient = StsRestClient(
-            baseUrl = mockHttpServerUrl,
+            baseUrl = stsRestServerUrl,
             serviceuserUsername = vaultSecrets.serviceuserUsername,
             serviceuserPassword = vaultSecrets.serviceuserPassword
         )
@@ -146,6 +135,7 @@ object OppfolgingstilfelleServiceSpek : Spek({
 
         afterGroup {
             database.stop()
+            stsRestServer.stop(1L, 10L)
             syketilfelleServer.stop(1L, 10L)
             mockServer.stop(1L, 10L)
         }
