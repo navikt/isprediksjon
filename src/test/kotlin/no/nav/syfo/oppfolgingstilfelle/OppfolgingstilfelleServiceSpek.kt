@@ -13,9 +13,6 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.testing.*
 import io.ktor.util.*
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.unmockkAll
 import no.nav.syfo.clients.aktor.AktorService
 import no.nav.syfo.clients.aktor.AktorregisterClient
 import no.nav.syfo.clients.aktor.IdentType
@@ -44,6 +41,18 @@ data class RSAktor(
     val feilmelding: String? = null
 )
 
+data class OidcToken(
+    val access_token: String,
+    val expires_in: Long,
+    val token_type: String
+)
+
+private val defaultToken = OidcToken(
+    access_token = "default access token",
+    expires_in = 3600,
+    token_type = "Bearer"
+)
+
 @InternalAPI
 object OppfolgingstilfelleServiceSpek : Spek({
 
@@ -56,6 +65,7 @@ object OppfolgingstilfelleServiceSpek : Spek({
     with(TestApplicationEngine()) {
         start()
 
+        val vaultSecrets = vaultSecrets
         val env = testEnvironment(
             getRandomPort(),
             ""
@@ -75,6 +85,12 @@ object OppfolgingstilfelleServiceSpek : Spek({
                 jackson {}
             }
             routing {
+                get("/rest/v1/sts/token") {
+                    val params = call.request.queryParameters
+                    if (params["grant_type"].equals("client_credentials") && params["scope"].equals("openid")) {
+                        call.respond(defaultToken)
+                    }
+                }
                 get("/${env.syketilfelleUrl}/kafka/oppfolgingstilfelle/beregn/${ARBEIDSTAKER_AKTORID.value}") {
                     call.respond(kOppfolgingstilfelleJson)
                 }
@@ -107,7 +123,11 @@ object OppfolgingstilfelleServiceSpek : Spek({
             }
         }.start()
 
-        val stsRestClient = mockk<StsRestClient>()
+        val stsRestClient = StsRestClient(
+            baseUrl = mockHttpServerUrl,
+            serviceuserUsername = vaultSecrets.serviceuserUsername,
+            serviceuserPassword = vaultSecrets.serviceuserPassword
+        )
         val aktorregisterClient = AktorregisterClient("$mockHttpServerUrl/${env.aktorregisterV1Url}", stsRestClient)
         val aktorService = AktorService(aktorregisterClient)
         val prediksjonInputService = PrediksjonInputService(database)
@@ -122,11 +142,6 @@ object OppfolgingstilfelleServiceSpek : Spek({
         afterGroup {
             database.stop()
             mockServer.stop(1L, 10L)
-            unmockkAll()
-        }
-
-        beforeEachTest {
-            every { stsRestClient.token() } returns "oidctoken"
         }
 
         afterEachTest {
