@@ -12,11 +12,10 @@ import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import testutil.*
 import testutil.UserConstants.ARBEIDSTAKER_FNR
-import testutil.generator.generateKOppfolgingstilfelle
 import testutil.generator.generateKOppfolgingstilfellePeker
+import testutil.mock.SyketilfelleMock
 import testutil.mock.mockAktorregisterServer
 import testutil.mock.mockStsRestServer
-import testutil.mock.mockSyketilfelleServer
 
 @InternalAPI
 object OppfolgingstilfelleServiceSpek : Spek({
@@ -29,14 +28,11 @@ object OppfolgingstilfelleServiceSpek : Spek({
         val database = TestDB()
 
         val kOppfolgingstilfellePeker = generateKOppfolgingstilfellePeker
-        val kOppfolgingstilfelle = generateKOppfolgingstilfelle
 
-        val syketilfelleServerPort = getRandomPort()
-        val syketilfelleServerUrl = "http://localhost:$syketilfelleServerPort"
-        val syketilfelleServer = mockSyketilfelleServer(
-            syketilfelleServerPort,
-            kOppfolgingstilfelle
-        ).start()
+        val syketilfelleMock = SyketilfelleMock()
+
+        val syketilfelleServer = syketilfelleMock.server.start()
+        val kOppfolgingstilfelle = syketilfelleMock.kOppfolgingstilfellePerson
 
         val stsRestServerPort = getRandomPort()
         val stsRestServerUrl = "http://localhost:$stsRestServerPort"
@@ -58,7 +54,7 @@ object OppfolgingstilfelleServiceSpek : Spek({
         val aktorregisterClient = AktorregisterClient(aktorregisterServerUrl, stsRestClient)
         val aktorService = AktorService(aktorregisterClient)
         val prediksjonInputService = PrediksjonInputService(database)
-        val syketilfelleClient = SyketilfelleClient(syketilfelleServerUrl, stsRestClient)
+        val syketilfelleClient = SyketilfelleClient(syketilfelleMock.url, stsRestClient)
 
         val oppfolgingstilfelleService = OppfolgingstilfelleService(
             aktorService,

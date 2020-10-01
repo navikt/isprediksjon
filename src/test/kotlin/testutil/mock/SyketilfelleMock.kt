@@ -13,6 +13,15 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import no.nav.syfo.clients.syketilfelle.domain.KOppfolgingstilfellePerson
 import testutil.UserConstants
+import testutil.generator.generateKOppfolgingstilfelle
+import testutil.getRandomPort
+
+class SyketilfelleMock {
+    private val port = getRandomPort()
+    val url = "http://localhost:$port"
+    val kOppfolgingstilfellePerson = generateKOppfolgingstilfelle
+    val server = mockSyketilfelleServer(port, kOppfolgingstilfellePerson)
+}
 
 fun mockSyketilfelleServer(
     port: Int,
