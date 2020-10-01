@@ -21,7 +21,7 @@ fun testEnvironment(port: Int, kafkaBootstrapServers: String) = Environment(
     isprediksjonDBURL = "12314.adeo.no",
     aktorregisterV1Url = "http://aktorregister",
     stsRestUrl = "http://stsrest",
-    syketilfelleUrl = "http://syfosyketilfelle"
+    syketilfelleUrl = "http://syfosyketilfelle:0001"
 )
 
 val vaultSecrets = VaultSecrets(

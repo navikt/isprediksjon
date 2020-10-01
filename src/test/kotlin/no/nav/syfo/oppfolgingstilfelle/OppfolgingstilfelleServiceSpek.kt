@@ -28,6 +28,7 @@ import testutil.UserConstants.ARBEIDSTAKER_AKTORID
 import testutil.UserConstants.ARBEIDSTAKER_FNR
 import testutil.generator.generateKOppfolgingstilfelle
 import testutil.generator.generateKOppfolgingstilfellePeker
+import testutil.mock.mockSyketilfelleServer
 import java.net.ServerSocket
 
 data class RSIdent(
@@ -78,6 +79,13 @@ object OppfolgingstilfelleServiceSpek : Spek({
 
         val kOppfolgingstilfelleJson = objectMapper.writeValueAsString(kOppfolgingstilfelle)
 
+        val syketilfelleServerPort = getRandomPort()
+        val syketilfelleServerUrl = "http://localhost:$syketilfelleServerPort"
+        val syketilfelleServer = mockSyketilfelleServer(
+            syketilfelleServerPort,
+            kOppfolgingstilfelleJson
+        ).start()
+
         val mockHttpServerPort = ServerSocket(0).use { it.localPort }
         val mockHttpServerUrl = "http://localhost:$mockHttpServerPort"
         val mockServer = embeddedServer(Netty, mockHttpServerPort) {
@@ -90,9 +98,6 @@ object OppfolgingstilfelleServiceSpek : Spek({
                     if (params["grant_type"].equals("client_credentials") && params["scope"].equals("openid")) {
                         call.respond(defaultToken)
                     }
-                }
-                get("/${env.syketilfelleUrl}/kafka/oppfolgingstilfelle/beregn/${ARBEIDSTAKER_AKTORID.value}") {
-                    call.respond(kOppfolgingstilfelleJson)
                 }
                 get("/${env.aktorregisterV1Url}/identer") {
                     when (call.request.headers[NAV_PERSONIDENTER]) {
@@ -131,7 +136,7 @@ object OppfolgingstilfelleServiceSpek : Spek({
         val aktorregisterClient = AktorregisterClient("$mockHttpServerUrl/${env.aktorregisterV1Url}", stsRestClient)
         val aktorService = AktorService(aktorregisterClient)
         val prediksjonInputService = PrediksjonInputService(database)
-        val syketilfelleClient = SyketilfelleClient("$mockHttpServerUrl/${env.syketilfelleUrl}", stsRestClient)
+        val syketilfelleClient = SyketilfelleClient(syketilfelleServerUrl, stsRestClient)
 
         val oppfolgingstilfelleService = OppfolgingstilfelleService(
             aktorService,
@@ -141,6 +146,7 @@ object OppfolgingstilfelleServiceSpek : Spek({
 
         afterGroup {
             database.stop()
+            syketilfelleServer.stop(1L, 10L)
             mockServer.stop(1L, 10L)
         }
 
