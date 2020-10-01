@@ -1,9 +1,5 @@
 package no.nav.syfo.oppfolgingstilfelle
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.server.testing.*
 import io.ktor.util.*
 import no.nav.syfo.clients.aktor.AktorService
@@ -25,12 +21,6 @@ import testutil.mock.mockSyketilfelleServer
 @InternalAPI
 object OppfolgingstilfelleServiceSpek : Spek({
 
-    val objectMapper: ObjectMapper = ObjectMapper().apply {
-        registerKotlinModule()
-        registerModule(JavaTimeModule())
-        configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
-    }
-
     with(TestApplicationEngine()) {
         start()
 
@@ -41,13 +31,11 @@ object OppfolgingstilfelleServiceSpek : Spek({
         val kOppfolgingstilfellePeker = generateKOppfolgingstilfellePeker
         val kOppfolgingstilfelle = generateKOppfolgingstilfelle
 
-        val kOppfolgingstilfelleJson = objectMapper.writeValueAsString(kOppfolgingstilfelle)
-
         val syketilfelleServerPort = getRandomPort()
         val syketilfelleServerUrl = "http://localhost:$syketilfelleServerPort"
         val syketilfelleServer = mockSyketilfelleServer(
             syketilfelleServerPort,
-            kOppfolgingstilfelleJson
+            kOppfolgingstilfelle
         ).start()
 
         val stsRestServerPort = getRandomPort()
