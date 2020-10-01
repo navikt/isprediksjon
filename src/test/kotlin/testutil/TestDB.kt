@@ -95,22 +95,6 @@ fun Connection.getPrediksjonInput(
     }
 }
 
-const val queryGetPrediksjonInput1 =
-    """
-    SELECT *
-    FROM prediksjon_input
-    """
-
-fun Connection.getPrediksjonInput1(): List<PPrediksjonInput> {
-    return use { connection ->
-        connection.prepareStatement(queryGetPrediksjonInput1).use {
-            it.executeQuery().toList {
-                toPPrediksjonInput()
-            }
-        }
-    }
-}
-
 fun ResultSet.toPPrediksjonInput(): PPrediksjonInput =
     PPrediksjonInput(
         id = getInt("id"),

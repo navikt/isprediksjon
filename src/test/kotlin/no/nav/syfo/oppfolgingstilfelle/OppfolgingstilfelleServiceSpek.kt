@@ -84,7 +84,7 @@ object OppfolgingstilfelleServiceSpek : Spek({
                 oppfolgingstilfelleService.receiveOppfolgingstilfelle(kOppfolgingstilfellePeker)
 
                 val prediksjonInputFnrList =
-                    database.connection.getPrediksjonInput1()
+                    database.connection.getPrediksjonInput(ARBEIDSTAKER_FNR)
 
                 prediksjonInputFnrList.size shouldBeEqualTo 1
 
