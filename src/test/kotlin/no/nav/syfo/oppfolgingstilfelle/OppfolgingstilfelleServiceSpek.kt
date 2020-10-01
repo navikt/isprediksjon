@@ -1,35 +1,76 @@
 package no.nav.syfo.oppfolgingstilfelle
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import io.ktor.application.*
+import io.ktor.features.*
+import io.ktor.jackson.*
+import io.ktor.response.*
+import io.ktor.routing.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import io.ktor.server.testing.*
 import io.ktor.util.*
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.unmockkAll
 import no.nav.syfo.clients.aktor.AktorService
+import no.nav.syfo.clients.sts.StsRestClient
 import no.nav.syfo.clients.syketilfelle.SyketilfelleClient
 import no.nav.syfo.prediksjon.PrediksjonInputService
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import testutil.TestDB
+import testutil.*
 import testutil.UserConstants.ARBEIDSTAKER_AKTORID
 import testutil.UserConstants.ARBEIDSTAKER_FNR
-import testutil.dropData
 import testutil.generator.generateKOppfolgingstilfelle
 import testutil.generator.generateKOppfolgingstilfellePeker
-import testutil.getPrediksjonInput1
+import java.net.ServerSocket
 
 @InternalAPI
 object OppfolgingstilfelleServiceSpek : Spek({
 
+    val objectMapper: ObjectMapper = ObjectMapper().apply {
+        registerKotlinModule()
+        registerModule(JavaTimeModule())
+        configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
+    }
+
     with(TestApplicationEngine()) {
         start()
 
+        val env = testEnvironment(
+            getRandomPort(),
+            ""
+        )
+
         val database = TestDB()
 
+        val kOppfolgingstilfellePeker = generateKOppfolgingstilfellePeker
+        val kOppfolgingstilfelle = generateKOppfolgingstilfelle
+
+        val kOppfolgingstilfelleJson = objectMapper.writeValueAsString(kOppfolgingstilfelle)
+
+        val mockHttpServerPort = ServerSocket(0).use { it.localPort }
+        val mockHttpServerUrl = "http://localhost:$mockHttpServerPort"
+        val mockServer = embeddedServer(Netty, mockHttpServerPort) {
+            install(ContentNegotiation) {
+                jackson {}
+            }
+            routing {
+                get("/${env.syketilfelleUrl}/kafka/oppfolgingstilfelle/beregn/${ARBEIDSTAKER_AKTORID.value}") {
+                    call.respond(kOppfolgingstilfelleJson)
+                }
+            }
+        }.start()
+
+        val stsRestClient = mockk<StsRestClient>()
         val aktorService = mockk<AktorService>()
         val prediksjonInputService = PrediksjonInputService(database)
-        val syketilfelleClient = mockk<SyketilfelleClient>()
+        val syketilfelleClient = SyketilfelleClient("$mockHttpServerUrl/${env.syketilfelleUrl}", stsRestClient)
 
         val oppfolgingstilfelleService = OppfolgingstilfelleService(
             aktorService,
@@ -37,27 +78,20 @@ object OppfolgingstilfelleServiceSpek : Spek({
             syketilfelleClient
         )
 
-        val kOppfolgingstilfellePeker = generateKOppfolgingstilfellePeker
-        val kOppfolgingstilfelle = generateKOppfolgingstilfelle
-
         afterGroup {
             database.stop()
+            mockServer.stop(1L, 10L)
             unmockkAll()
         }
 
         beforeEachTest {
+            every { stsRestClient.token() } returns "oidctoken"
             every {
                 aktorService.fodselsnummerForAktor(
                     ARBEIDSTAKER_AKTORID,
                     ""
                 )
             } returns ARBEIDSTAKER_FNR.value
-            every {
-                syketilfelleClient.getOppfolgingstilfelle(
-                    ARBEIDSTAKER_AKTORID,
-                    ""
-                )
-            } returns kOppfolgingstilfelle
         }
 
         afterEachTest {

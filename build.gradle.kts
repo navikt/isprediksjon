@@ -44,6 +44,8 @@ dependencies {
     implementation(kotlin("reflect"))
 
     implementation("io.ktor:ktor-server-netty:${Versions.ktorVersion}")
+    implementation("io.ktor:ktor-jackson:${Versions.ktorVersion}")
+    implementation("io.ktor:ktor-client-jackson:${Versions.ktorVersion}")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:${Versions.coroutinesVersion}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutinesVersion}")
