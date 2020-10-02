@@ -18,7 +18,6 @@ object Versions {
     const val logbackVersion = "1.2.3"
     const val logstashEncoderVersion = "6.3"
     const val mockkVersion = "1.10.0"
-    const val orgJsonVersion = "20180813"
     const val postgresVersion = "42.2.13"
     const val postgresTestContainersVersion = "1.14.3"
     const val prometheusVersion = "0.8.1"
@@ -69,7 +68,6 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${Versions.jacksonVersion}")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jacksonVersion}")
 
-    implementation("org.json:json:${Versions.orgJsonVersion}")
     implementation("io.arrow-kt:arrow-core-data:${Versions.arrowVersion}")
 
     testImplementation("org.amshove.kluent:kluent:${Versions.kluentVersion}")

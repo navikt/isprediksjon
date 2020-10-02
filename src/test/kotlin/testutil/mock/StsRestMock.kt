@@ -39,11 +39,13 @@ class StsRestMock {
 private val defaultToken = OidcToken(
     access_token = "default access token",
     expires_in = 3600,
-    token_type = "Bearer"
+    token_type = "Bearer",
+    unknown_type = "uknown"
 )
 
 data class OidcToken(
     val access_token: String,
     val expires_in: Long,
-    val token_type: String
+    val token_type: String,
+    val unknown_type: String
 )
