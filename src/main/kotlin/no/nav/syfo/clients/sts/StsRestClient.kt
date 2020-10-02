@@ -1,8 +1,16 @@
 package no.nav.syfo.clients.sts
 
-import com.github.kittinunf.fuel.httpGet
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.features.json.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
-import no.nav.syfo.util.responseJSON
+import no.nav.syfo.util.basicHeader
 import org.json.JSONObject
 import java.time.LocalDateTime
 
@@ -11,16 +19,27 @@ class StsRestClient(
     private val serviceuserUsername: String,
     private val serviceuserPassword: String
 ) {
+    private val client = HttpClient(CIO) {
+        install(JsonFeature) {
+            serializer = JacksonSerializer {
+                registerKotlinModule()
+                registerModule(JavaTimeModule())
+                configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            }
+        }
+    }
+
     private var cachedOidcToken: Token? = null
 
-    fun token(): String {
+    suspend fun token(): String {
         if (Token.shouldRenew(cachedOidcToken)) {
-            val (_, _, result) = "$baseUrl/rest/v1/sts/token?grant_type=client_credentials&scope=openid".httpGet()
-                .authenticate(serviceuserUsername, serviceuserPassword)
-                .header(mapOf(HttpHeaders.Accept to "application/json"))
-                .responseJSON()
+            val url = "$baseUrl/rest/v1/sts/token?grant_type=client_credentials&scope=openid"
+            val response: HttpResponse = client.get(url) {
+                header(HttpHeaders.Authorization, basicHeader(serviceuserUsername, serviceuserPassword))
+                accept(ContentType.Application.Json)
+            }
 
-            cachedOidcToken = result.get().mapToToken()
+            cachedOidcToken = JSONObject(response.receive<String>()).mapToToken()
         }
 
         return cachedOidcToken!!.accessToken

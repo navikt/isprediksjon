@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.flatMap
 import com.github.kittinunf.fuel.httpGet
 import io.ktor.http.*
+import kotlinx.coroutines.runBlocking
 import no.nav.syfo.clients.sts.StsRestClient
 import no.nav.syfo.util.*
 import org.json.JSONObject
@@ -16,7 +17,9 @@ class AktorregisterClient(
     private val stsRestClient: StsRestClient
 ) {
     fun getIdenter(ident: String, callId: String): Either<String, List<Ident>> {
-        val bearer = stsRestClient.token()
+        val bearer = runBlocking {
+            stsRestClient.token()
+        }
 
         val (_, _, result) = "$baseUrl/identer?gjeldende=true".httpGet()
             .header(
