@@ -1,11 +1,14 @@
 package no.nav.syfo.clients.syketilfelle
 
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import com.github.kittinunf.fuel.httpGet
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.features.json.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import no.nav.syfo.clients.sts.StsRestClient
 import no.nav.syfo.clients.syketilfelle.domain.KOppfolgingstilfellePerson
@@ -23,56 +26,50 @@ class SyketilfelleClient(
     private val baseUrl: String,
     private val stsRestClient: StsRestClient
 ) {
-    fun getOppfolgingstilfelle(
+    private val client = HttpClient(CIO) {
+        install(JsonFeature) {
+            serializer = JacksonSerializer {
+                registerKotlinModule()
+                registerModule(JavaTimeModule())
+                configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            }
+        }
+    }
+
+    suspend fun getOppfolgingstilfelle(
         aktorId: AktorId,
         callId: String
     ): KOppfolgingstilfellePerson? {
         val bearer = stsRestClient.token()
 
-        val (_, response, result) = getSyfosyketilfelleUrl(aktorId).httpGet()
-            .header(
-                mapOf(
-                    HttpHeaders.Authorization to bearerHeader(bearer),
-                    HttpHeaders.Accept to "application/json",
-                    NAV_CALL_ID to callId,
-                    NAV_CONSUMER_ID to APP_CONSUMER_ID
-                )
-            )
-            .responseString()
+        val response: HttpResponse = client.get(getSyfosyketilfelleUrl(aktorId)) {
+            header(HttpHeaders.Authorization, bearerHeader(bearer))
+            header(NAV_CALL_ID, callId)
+            header(NAV_CONSUMER_ID, APP_CONSUMER_ID)
+            accept(ContentType.Application.Json)
+        }
 
-        result.fold(
-            success = {
-                val responseCode = response.statusCode == 204
-                return if (responseCode) {
-                    log.error("Syketilfelle returned HTTP-$responseCode: No Oppfolgingstilfelle was found for AktorId")
-                    COUNT_CALL_SYKETILFELLE_OPPFOLGINGSTILFELLE_AKTOR_EMPTY.inc()
-                    null
-                } else {
-                    COUNT_CALL_SYKETILFELLE_OPPFOLGINGSTILFELLE_AKTOR_SUCCESS.inc()
-                    objectMapper.readValue<KOppfolgingstilfellePerson>(result.get())
-                }
-            },
-            failure = {
-                COUNT_CALL_SYKETILFELLE_OPPFOLGINGSTILFELLE_AKTOR_FAIL.inc()
-                val exception = it.exception
-                val errorMessage =
-                    "Error with responseCode=${response.statusCode} for callId=$callId when requesting Oppfolgingstilfelle for Aktord from syfosyketilfelle: ${exception.message}"
-                log.error(
-                    errorMessage,
-                    exception
-                )
+        when (response.status) {
+            HttpStatusCode.OK -> {
+                COUNT_CALL_SYKETILFELLE_OPPFOLGINGSTILFELLE_AKTOR_SUCCESS.inc()
+                return response.receive<KOppfolgingstilfellePerson>()
+            }
+            HttpStatusCode.NoContent -> {
+                log.error("Syketilfelle returned HTTP-${response.status.value}: No Oppfolgingstilfelle was found for AktorId")
+                COUNT_CALL_SYKETILFELLE_OPPFOLGINGSTILFELLE_AKTOR_EMPTY.inc()
                 return null
             }
-        )
+            else -> {
+                COUNT_CALL_SYKETILFELLE_OPPFOLGINGSTILFELLE_AKTOR_FAIL.inc()
+                val errorMessage =
+                    "Error with responseCode=${response.status.value} for callId=$callId when requesting Oppfolgingstilfelle for aktorId from syfosyketilfelle"
+                log.error(errorMessage)
+                return null
+            }
+        }
     }
 
     private fun getSyfosyketilfelleUrl(aktorId: AktorId): String {
         return "$baseUrl/kafka/oppfolgingstilfelle/beregn/${aktorId.value}"
-    }
-
-    private val objectMapper: ObjectMapper = ObjectMapper().apply {
-        registerKotlinModule()
-        registerModule(JavaTimeModule())
-        configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     }
 }
