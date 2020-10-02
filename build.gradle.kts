@@ -9,7 +9,6 @@ object Versions {
     const val arrowVersion = "0.9.0"
     const val coroutinesVersion = "1.3.9"
     const val flywayVersion = "6.4.4"
-    const val fuelVersion = "1.15.1"
     const val hikariVersion = "3.3.0"
     const val jacksonVersion = "2.9.8"
     const val kafkaVersion = "2.3.1"
@@ -71,7 +70,6 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jacksonVersion}")
 
     implementation("org.json:json:${Versions.orgJsonVersion}")
-    implementation("com.github.kittinunf.fuel:fuel:${Versions.fuelVersion}")
     implementation("io.arrow-kt:arrow-core-data:${Versions.arrowVersion}")
 
     testImplementation("org.amshove.kluent:kluent:${Versions.kluentVersion}")

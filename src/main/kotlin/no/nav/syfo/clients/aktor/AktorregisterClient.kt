@@ -2,7 +2,15 @@ package no.nav.syfo.clients.aktor
 
 import arrow.core.Either
 import arrow.core.flatMap
-import com.github.kittinunf.fuel.httpGet
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.features.json.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import no.nav.syfo.clients.sts.StsRestClient
 import no.nav.syfo.util.*
@@ -15,24 +23,31 @@ class AktorregisterClient(
     private val baseUrl: String,
     private val stsRestClient: StsRestClient
 ) {
-    fun getIdenter(ident: String, callId: String): Either<String, List<Ident>> {
+    private val client = HttpClient(CIO) {
+        install(JsonFeature) {
+            serializer = JacksonSerializer {
+                registerKotlinModule()
+                registerModule(JavaTimeModule())
+                configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            }
+        }
+    }
+
+    suspend fun getIdenter(ident: String, callId: String): Either<String, List<Ident>> {
         val bearer = stsRestClient.token()
 
-        val (_, _, result) = "$baseUrl/identer?gjeldende=true".httpGet()
-            .header(
-                mapOf(
-                    HttpHeaders.Authorization to bearerHeader(bearer),
-                    HttpHeaders.Accept to "application/json",
-                    NAV_CALL_ID to callId,
-                    NAV_CONSUMER_ID to APP_CONSUMER_ID,
-                    NAV_PERSONIDENTER to ident
-                )
-            )
-            .responseString()
+        val url = "$baseUrl/identer?gjeldende=true"
+        val response: HttpResponse = client.get(url) {
+            header(HttpHeaders.Authorization, bearerHeader(bearer))
+            header(NAV_CALL_ID, callId)
+            header(NAV_CONSUMER_ID, APP_CONSUMER_ID)
+            header(NAV_PERSONIDENTER, ident)
+            accept(ContentType.Application.Json)
+        }
 
-        val response = JSONObject(result.get())
+        val responseJSONObject = JSONObject(response.receive<String>())
 
-        val identResponse = response.getJSONObject(ident)
+        val identResponse = responseJSONObject.getJSONObject(ident)
 
         return if (identResponse.isNull("identer")) {
             val errorMessage = identResponse.getString("feilmelding")
@@ -57,7 +72,7 @@ class AktorregisterClient(
         }
     }
 
-    private fun getIdent(
+    private suspend fun getIdent(
         ident: String,
         type: IdentType,
         callId: String
@@ -71,7 +86,7 @@ class AktorregisterClient(
         }
     }
 
-    fun getNorskIdent(ident: String, callId: String): Either<String, String> {
+    suspend fun getNorskIdent(ident: String, callId: String): Either<String, String> {
         return getIdent(ident, IdentType.NorskIdent, callId)
     }
 }
