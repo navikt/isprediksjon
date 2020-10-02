@@ -10,12 +10,15 @@ import no.nav.syfo.prediksjon.PrediksjonInputService
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import testutil.*
+import testutil.TestDB
 import testutil.UserConstants.ARBEIDSTAKER_FNR
+import testutil.dropData
 import testutil.generator.generateKOppfolgingstilfellePeker
+import testutil.getPrediksjonInput
+import testutil.mock.AktorregisterMock
+import testutil.mock.StsRestMock
 import testutil.mock.SyketilfelleMock
-import testutil.mock.mockAktorregisterServer
-import testutil.mock.mockStsRestServer
+import testutil.vaultSecrets
 
 @InternalAPI
 object OppfolgingstilfelleServiceSpek : Spek({
@@ -27,34 +30,27 @@ object OppfolgingstilfelleServiceSpek : Spek({
 
         val database = TestDB()
 
-        val kOppfolgingstilfellePeker = generateKOppfolgingstilfellePeker
-
-        val syketilfelleMock = SyketilfelleMock()
-
-        val syketilfelleServer = syketilfelleMock.server.start()
-        val kOppfolgingstilfelle = syketilfelleMock.kOppfolgingstilfellePerson
-
-        val stsRestServerPort = getRandomPort()
-        val stsRestServerUrl = "http://localhost:$stsRestServerPort"
-        val stsRestServer = mockStsRestServer(
-            stsRestServerPort
-        ).start()
-
-        val aktorregisterServerPort = getRandomPort()
-        val aktorregisterServerUrl = "http://localhost:$aktorregisterServerPort"
-        val aktorregisterServer = mockAktorregisterServer(
-            aktorregisterServerPort
-        ).start()
-
+        val stsRestMock = StsRestMock()
         val stsRestClient = StsRestClient(
-            baseUrl = stsRestServerUrl,
+            baseUrl = stsRestMock.url,
             serviceuserUsername = vaultSecrets.serviceuserUsername,
             serviceuserPassword = vaultSecrets.serviceuserPassword
         )
-        val aktorregisterClient = AktorregisterClient(aktorregisterServerUrl, stsRestClient)
+
+        val aktorregisterMock = AktorregisterMock()
+        val aktorregisterClient = AktorregisterClient(
+            baseUrl = aktorregisterMock.url,
+            stsRestClient = stsRestClient
+        )
         val aktorService = AktorService(aktorregisterClient)
+
+        val syketilfelleMock = SyketilfelleMock()
+        val syketilfelleClient = SyketilfelleClient(
+            baseUrl = syketilfelleMock.url,
+            stsRestClient = stsRestClient
+        )
+
         val prediksjonInputService = PrediksjonInputService(database)
-        val syketilfelleClient = SyketilfelleClient(syketilfelleMock.url, stsRestClient)
 
         val oppfolgingstilfelleService = OppfolgingstilfelleService(
             aktorService,
@@ -62,11 +58,17 @@ object OppfolgingstilfelleServiceSpek : Spek({
             syketilfelleClient
         )
 
+        beforeGroup {
+            aktorregisterMock.server.start()
+            stsRestMock.server.start()
+            syketilfelleMock.server.start()
+        }
+
         afterGroup {
             database.stop()
-            aktorregisterServer.stop(1L, 10L)
-            stsRestServer.stop(1L, 10L)
-            syketilfelleServer.stop(1L, 10L)
+            aktorregisterMock.server.stop(1L, 10L)
+            stsRestMock.server.stop(1L, 10L)
+            syketilfelleMock.server.stop(1L, 10L)
         }
 
         afterEachTest {
@@ -75,6 +77,9 @@ object OppfolgingstilfelleServiceSpek : Spek({
         }
 
         describe("Read and store PPrediksjonInput") {
+
+            val kOppfolgingstilfellePeker = generateKOppfolgingstilfellePeker
+            val kOppfolgingstilfellePerson = syketilfelleMock.kOppfolgingstilfellePerson
 
             it("should store PrediksjonInput based on Oppfolgingstilfelle") {
                 oppfolgingstilfelleService.receiveOppfolgingstilfelle(kOppfolgingstilfellePeker)
@@ -88,8 +93,8 @@ object OppfolgingstilfelleServiceSpek : Spek({
 
                 returnedPrediksjonInput.fnr shouldBeEqualTo ARBEIDSTAKER_FNR.value
                 returnedPrediksjonInput.aktorId shouldBeEqualTo kOppfolgingstilfellePeker.aktorId
-                returnedPrediksjonInput.tilfelleStartDate shouldBeEqualTo kOppfolgingstilfelle.tidslinje.first().dag
-                returnedPrediksjonInput.tilfelleEndDate shouldBeEqualTo kOppfolgingstilfelle.tidslinje.last().dag
+                returnedPrediksjonInput.tilfelleStartDate shouldBeEqualTo kOppfolgingstilfellePerson.tidslinje.first().dag
+                returnedPrediksjonInput.tilfelleEndDate shouldBeEqualTo kOppfolgingstilfellePerson.tidslinje.last().dag
             }
         }
     }

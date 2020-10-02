@@ -21,24 +21,24 @@ class SyketilfelleMock {
     val url = "http://localhost:$port"
     val kOppfolgingstilfellePerson = generateKOppfolgingstilfelle
     val server = mockSyketilfelleServer(port, kOppfolgingstilfellePerson)
-}
 
-fun mockSyketilfelleServer(
-    port: Int,
-    kOppfolgingstilfellePerson: KOppfolgingstilfellePerson
-): NettyApplicationEngine {
-    val kOppfolgingstilfelleJson = objectMapper.writeValueAsString(kOppfolgingstilfellePerson)
+    private fun mockSyketilfelleServer(
+        port: Int,
+        kOppfolgingstilfellePerson: KOppfolgingstilfellePerson
+    ): NettyApplicationEngine {
+        val kOppfolgingstilfelleJson = objectMapper.writeValueAsString(kOppfolgingstilfellePerson)
 
-    return embeddedServer(
-        factory = Netty,
-        port = port
-    ) {
-        install(ContentNegotiation) {
-            jackson {}
-        }
-        routing {
-            get("/kafka/oppfolgingstilfelle/beregn/${UserConstants.ARBEIDSTAKER_AKTORID.value}") {
-                call.respond(kOppfolgingstilfelleJson)
+        return embeddedServer(
+            factory = Netty,
+            port = port
+        ) {
+            install(ContentNegotiation) {
+                jackson {}
+            }
+            routing {
+                get("/kafka/oppfolgingstilfelle/beregn/${UserConstants.ARBEIDSTAKER_AKTORID.value}") {
+                    call.respond(kOppfolgingstilfelleJson)
+                }
             }
         }
     }
