@@ -12,9 +12,9 @@ import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import no.nav.syfo.clients.aktor.domain.IdentinfoListe
 import no.nav.syfo.clients.sts.StsRestClient
 import no.nav.syfo.util.*
-import org.json.JSONObject
 import org.slf4j.LoggerFactory
 
 private val log = LoggerFactory.getLogger(AktorregisterClient::class.java)
@@ -45,30 +45,31 @@ class AktorregisterClient(
             accept(ContentType.Application.Json)
         }
 
-        val responseJSONObject = JSONObject(response.receive<String>())
+        val mapResponse = response.receive<Map<String, IdentinfoListe>>()
+        val identResponse: IdentinfoListe? = mapResponse[ident]
 
-        val identResponse = responseJSONObject.getJSONObject(ident)
-
-        return if (identResponse.isNull("identer")) {
-            val errorMessage = identResponse.getString("feilmelding")
-            log.error("lookup gjeldende identer feilet med feilmelding $errorMessage")
-            Either.Left(errorMessage)
-        } else {
-            val identer = identResponse.getJSONArray("identer")
-
-            Either.Right(
-                identer.map {
-                    it as JSONObject
-                }.map {
-                    Ident(
-                        it.getString("ident"),
-                        it.getEnum(
-                            IdentType::class.java,
-                            "identgruppe"
+        return when {
+            identResponse == null -> {
+                val errorMessage = "Lookup gjeldende identer feilet"
+                log.error(errorMessage)
+                Either.Left(errorMessage)
+            }
+            identResponse.identer.isEmpty() -> {
+                val errorMessage = "Lookup gjeldende identer feilet med feilmelding ${identResponse.feilmelding}"
+                log.error(errorMessage)
+                Either.Left(errorMessage)
+            }
+            else -> {
+                val identer = identResponse.identer
+                Either.Right(
+                    identer.map {
+                        Ident(
+                            it.ident,
+                            IdentType.valueOf(it.identgruppe)
                         )
-                    )
-                }
-            )
+                    }
+                )
+            }
         }
     }
 
