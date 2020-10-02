@@ -11,7 +11,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import no.nav.syfo.util.basicHeader
-import org.json.JSONObject
 import java.time.LocalDateTime
 
 class StsRestClient(
@@ -39,26 +38,18 @@ class StsRestClient(
                 accept(ContentType.Application.Json)
             }
 
-            cachedOidcToken = JSONObject(response.receive<String>()).mapToToken()
+            cachedOidcToken = response.receive<Token>()
         }
 
-        return cachedOidcToken!!.accessToken
-    }
-
-    private fun JSONObject.mapToToken(): Token {
-        return Token(
-            getString("access_token"),
-            getString("token_type"),
-            getInt("expires_in")
-        )
+        return cachedOidcToken!!.access_token
     }
 
     data class Token(
-        val accessToken: String,
-        val type: String,
-        val expiresIn: Int
+        val access_token: String,
+        val token_type: String,
+        val expires_in: Int
     ) {
-        val expirationTime: LocalDateTime = LocalDateTime.now().plusSeconds(expiresIn - 10L)
+        val expirationTime: LocalDateTime = LocalDateTime.now().plusSeconds(expires_in - 10L)
 
         companion object {
             fun shouldRenew(token: Token?): Boolean {
