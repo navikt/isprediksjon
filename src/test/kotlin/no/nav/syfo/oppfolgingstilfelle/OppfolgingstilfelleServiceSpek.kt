@@ -2,6 +2,7 @@ package no.nav.syfo.oppfolgingstilfelle
 
 import io.ktor.server.testing.*
 import io.ktor.util.*
+import kotlinx.coroutines.runBlocking
 import no.nav.syfo.clients.aktor.AktorService
 import no.nav.syfo.clients.aktor.AktorregisterClient
 import no.nav.syfo.clients.sts.StsRestClient
@@ -82,7 +83,9 @@ object OppfolgingstilfelleServiceSpek : Spek({
             val kOppfolgingstilfellePerson = syketilfelleMock.kOppfolgingstilfellePerson
 
             it("should store PrediksjonInput based on Oppfolgingstilfelle") {
-                oppfolgingstilfelleService.receiveOppfolgingstilfelle(kOppfolgingstilfellePeker)
+                runBlocking {
+                    oppfolgingstilfelleService.receiveOppfolgingstilfelle(kOppfolgingstilfellePeker)
+                }
 
                 val prediksjonInputFnrList =
                     database.connection.getPrediksjonInput(ARBEIDSTAKER_FNR)

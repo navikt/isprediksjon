@@ -1,6 +1,5 @@
 package testutil.mock
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
@@ -26,26 +25,22 @@ class SyketilfelleMock {
         port: Int,
         kOppfolgingstilfellePerson: KOppfolgingstilfellePerson
     ): NettyApplicationEngine {
-        val kOppfolgingstilfelleJson = objectMapper.writeValueAsString(kOppfolgingstilfellePerson)
-
         return embeddedServer(
             factory = Netty,
             port = port
         ) {
             install(ContentNegotiation) {
-                jackson {}
+                jackson {
+                    registerKotlinModule()
+                    registerModule(JavaTimeModule())
+                    configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+                }
             }
             routing {
                 get("/kafka/oppfolgingstilfelle/beregn/${UserConstants.ARBEIDSTAKER_AKTORID.value}") {
-                    call.respond(kOppfolgingstilfelleJson)
+                    call.respond(kOppfolgingstilfellePerson)
                 }
             }
         }
     }
-}
-
-private val objectMapper: ObjectMapper = ObjectMapper().apply {
-    registerKotlinModule()
-    registerModule(JavaTimeModule())
-    configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
 }

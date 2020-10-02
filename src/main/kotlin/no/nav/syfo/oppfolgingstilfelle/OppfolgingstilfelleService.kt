@@ -17,7 +17,7 @@ class OppfolgingstilfelleService(
     private val prediksjonInputService: PrediksjonInputService,
     private val syketilfelleClient: SyketilfelleClient
 ) {
-    fun receiveOppfolgingstilfelle(
+    suspend fun receiveOppfolgingstilfelle(
         oppfolgingstilfellePeker: KOppfolgingstilfellePeker,
         callId: String = ""
     ) {
