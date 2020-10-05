@@ -5,6 +5,7 @@ data class Environment(
     val applicationPort: Int = getEnvVar("APPLICATION_PORT", "8080").toInt(),
 
     val kafkaBootstrapServers: String = getEnvVar("KAFKA_BOOTSTRAP_SERVERS_URL"),
+    val oppfolgingstilfelleTopic: String = "aapen-syfo-oppfolgingstilfelle-v1",
     val sm2013ManuellBehandlingTopic: String = getEnvVar("KAFKA_SM2013_MANUELL_BEHANDLING", "privat-syfo-sm2013-manuellBehandling"),
     val sm2013AutomatiskBehandlingTopic: String = getEnvVar("KAFKA_SM2013_AUTOMATISK_BEHANDLING_TOPIC", "privat-syfo-sm2013-automatiskBehandling"),
     val smregisterRecievedSykmeldingBackupTopic: String = getEnvVar("KAFKA_SMREGISTER_RECIEVED_SYKMELDING_BACKUP_TOPIC", "privat-syfosmregister-received-sykmelding-backup"),
@@ -20,6 +21,8 @@ data class Environment(
     val aktorregisterV1Url: String = getEnvVar("AKTORREGISTER_V1_URL", "https://app.adeo.no/aktoerregister/api/v1"),
     val stsRestUrl: String = getEnvVar("SECURITY_TOKEN_SERVICE_REST_URL", "https://security-token-service.nais.adeo.no"),
     val syketilfelleUrl: String = getEnvVar("SYFOSYKETILFELLE_URL", "http://syfosyketilfelle"),
+
+    val isProcessOppfolgingstilfelleOn: Boolean = getEnvVar("NAIS_CLUSTER_NAME", "local") == "dev-fss",
 
     val developmentMode: Boolean = getEnvVar("DEVELOPMENT_MODE", "false").toBoolean()
 )
