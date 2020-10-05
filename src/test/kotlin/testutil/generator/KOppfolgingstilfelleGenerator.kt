@@ -2,6 +2,7 @@ package testutil.generator
 
 import no.nav.syfo.clients.syketilfelle.domain.KOppfolgingstilfellePerson
 import no.nav.syfo.clients.syketilfelle.domain.KSyketilfelledag
+import no.nav.syfo.oppfolgingstilfelle.domain.DAYS_START_CANDIDATE
 import no.nav.syfo.oppfolgingstilfelle.domain.KOppfolgingstilfellePeker
 import testutil.UserConstants.ARBEIDSTAKER_AKTORID
 import testutil.UserConstants.VIRKSOMHETSNUMMER
@@ -19,7 +20,7 @@ val generateKOppfolgingstilfelle =
         ARBEIDSTAKER_AKTORID.value,
         listOf(
             KSyketilfelledag(
-                LocalDate.now().minusDays(10),
+                LocalDate.now().minusDays(DAYS_START_CANDIDATE),
                 null
             ),
             KSyketilfelledag(

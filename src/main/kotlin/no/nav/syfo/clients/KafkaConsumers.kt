@@ -30,5 +30,6 @@ class KafkaConsumers(
     env: Environment,
     vaultSecrets: VaultSecrets
 ) {
+    val kafkaConsumerOppfolgingstilfelle = KafkaConsumer<String, String>(kafkaConsumerProperties(env, vaultSecrets))
     val kafkaConsumerSmReg = KafkaConsumer<String, String>(kafkaConsumerProperties(env, vaultSecrets))
 }

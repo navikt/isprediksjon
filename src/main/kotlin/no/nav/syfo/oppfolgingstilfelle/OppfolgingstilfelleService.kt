@@ -10,6 +10,7 @@ import no.nav.syfo.metric.COUNT_OPPFOLGINGSTILFELLE_SKIPPED_OPPFOLGINGSTILFELLE
 import no.nav.syfo.metric.COUNT_PREDIKSJON_INPUT_CREATED
 import no.nav.syfo.oppfolgingstilfelle.domain.KOppfolgingstilfellePeker
 import no.nav.syfo.oppfolgingstilfelle.domain.PersonOppfolgingstilfelle
+import no.nav.syfo.oppfolgingstilfelle.domain.isCandidateForPrediction
 import no.nav.syfo.prediksjon.PrediksjonInputService
 
 class OppfolgingstilfelleService(
@@ -38,8 +39,10 @@ class OppfolgingstilfelleService(
                 tilfelleStartDate = it.tidslinje.first().dag,
                 tilfelleEndDate = it.tidslinje.last().dag
             )
-            prediksjonInputService.createPrediksjonInput(personOppfolgingstilfelle)
-            COUNT_PREDIKSJON_INPUT_CREATED.inc()
+            if (personOppfolgingstilfelle.isCandidateForPrediction()) {
+                prediksjonInputService.createPrediksjonInput(personOppfolgingstilfelle)
+                COUNT_PREDIKSJON_INPUT_CREATED.inc()
+            }
         } ?: return skipOppfolgingstilfelleWithMissingValue(MissingValue.OPPFOLGINGSTILFELLE)
     }
 
