@@ -103,5 +103,5 @@ fun ResultSet.toPPrediksjonInput(): PPrediksjonInput =
         aktorId = getString("aktorid"),
         tilfelleStartDate = getObject("tilfelle_start_date", LocalDate::class.java),
         tilfelleEndDate = getObject("tilfelle_end_date", LocalDate::class.java),
-        created = getTimestamp("created").toLocalDateTime()
+        created = getTimestamp("input_created").toLocalDateTime()
     )
