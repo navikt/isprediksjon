@@ -17,7 +17,7 @@ const val queryCreatePrediksjonInput =
             aktorid,
             tilfelle_start_date,
             tilfelle_end_date,
-            created
+            input_created
         ) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?) RETURNING id
     """
 
