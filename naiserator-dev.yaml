@@ -69,3 +69,5 @@ spec:
       value: "https://security-token-service.nais.preprod.local"
     - name: SYFOSYKETILFELLE_URL
       value: "https://syfosyketilfelle.nais.preprod.local"
+    - name: IS_PROCESS_OPPFOLGINGSTILFELLE_ON
+      value: true

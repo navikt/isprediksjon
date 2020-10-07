@@ -22,7 +22,7 @@ data class Environment(
     val stsRestUrl: String = getEnvVar("SECURITY_TOKEN_SERVICE_REST_URL", "https://security-token-service.nais.adeo.no"),
     val syketilfelleUrl: String = getEnvVar("SYFOSYKETILFELLE_URL", "http://syfosyketilfelle"),
 
-    val isProcessOppfolgingstilfelleOn: Boolean = getEnvVar("NAIS_CLUSTER_NAME", "local") == "dev-fss",
+    val isProcessOppfolgingstilfelleOn: Boolean = getEnvVar("IS_PROCESS_OPPFOLGINGSTILFELLE_ON", "false").toBoolean(),
 
     val developmentMode: Boolean = getEnvVar("DEVELOPMENT_MODE", "false").toBoolean()
 )
