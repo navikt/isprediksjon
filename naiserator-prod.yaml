@@ -70,4 +70,4 @@ spec:
     - name: SYFOSYKETILFELLE_URL
       value: "https://syfosyketilfelle.nais.adeo.no"
     - name: IS_PROCESS_OPPFOLGINGSTILFELLE_ON
-      value: true
+      value: "true"

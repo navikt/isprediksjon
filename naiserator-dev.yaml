@@ -6,7 +6,7 @@ metadata:
   labels:
     team: teamsykefravr
 spec:
-  image: {{ image }}
+  image: docker.pkg.github.com/navikt/isprediksjon/isprediksjon:51b4e8a1103f5bb025dbd4f403384f397b2ad5e6
   replicas:
     min: 1
     max: 2
@@ -70,4 +70,4 @@ spec:
     - name: SYFOSYKETILFELLE_URL
       value: "https://syfosyketilfelle.nais.preprod.local"
     - name: IS_PROCESS_OPPFOLGINGSTILFELLE_ON
-      value: true
+      value: "true"
