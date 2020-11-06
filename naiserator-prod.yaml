@@ -29,10 +29,10 @@ spec:
   resources:
     limits:
       cpu: 500m
-      memory: 1Gi
+      memory: 1536Mi
     requests:
       cpu: 300m
-      memory: 768Mi
+      memory: 1Gi
   vault:
     enabled: true
     paths:
