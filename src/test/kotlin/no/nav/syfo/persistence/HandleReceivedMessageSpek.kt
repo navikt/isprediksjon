@@ -6,7 +6,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.unmockkAll
 import no.nav.common.KafkaEnvironment
-import no.nav.syfo.clients.kafkaConsumerProperties
+import no.nav.syfo.clients.kafkaConsumerSmregProperties
 import org.amshove.kluent.shouldBeEqualTo
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -72,7 +72,7 @@ object HandleReceivedMessageSpek : Spek({
         with(TestApplicationEngine()) {
             start()
 
-            val consumerPropertiesOversikthendelse = kafkaConsumerProperties(env, vaultSecrets)
+            val consumerPropertiesOversikthendelse = kafkaConsumerSmregProperties(env, vaultSecrets)
                 .overrideForTest()
                 .apply {
                     put("specific.avro.reader", false)

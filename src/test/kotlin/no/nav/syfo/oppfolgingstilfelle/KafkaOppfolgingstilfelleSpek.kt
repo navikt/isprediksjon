@@ -8,12 +8,13 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.server.testing.*
 import io.ktor.util.*
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import no.nav.common.KafkaEnvironment
 import no.nav.syfo.clients.aktor.AktorService
 import no.nav.syfo.clients.aktor.AktorregisterClient
-import no.nav.syfo.clients.kafkaConsumerProperties
+import no.nav.syfo.clients.kafkaConsumerOppfolgingstilfelleProperties
 import no.nav.syfo.clients.sts.StsRestClient
 import no.nav.syfo.clients.syketilfelle.SyketilfelleClient
 import no.nav.syfo.pollAndProcessOppfolgingstilfelleTopic
@@ -105,7 +106,7 @@ object KafkaOppfolgingstilfelleSpek : Spek({
         }
 
         describe("Read and store PPrediksjonInput") {
-            val consumerPropertiesOppfolgingstilfelle = kafkaConsumerProperties(env, testutil.vaultSecrets)
+            val consumerPropertiesOppfolgingstilfelle = kafkaConsumerOppfolgingstilfelleProperties(env, testutil.vaultSecrets)
                 .overrideForTest()
 
             val kafkaConsumerOppfolgingstilfelle = KafkaConsumer<String, String>(consumerPropertiesOppfolgingstilfelle)
@@ -128,6 +129,7 @@ object KafkaOppfolgingstilfelleSpek : Spek({
                 )
 
                 val mockConsumer = mockk<KafkaConsumer<String, String>>()
+                justRun { mockConsumer.commitSync() }
                 every { mockConsumer.poll(Duration.ofMillis(0)) } returns ConsumerRecords(
                     mapOf(oppfolgingstilfelleTopicPartition to listOf(oppfolgingstilfellePekerRecord))
                 )
