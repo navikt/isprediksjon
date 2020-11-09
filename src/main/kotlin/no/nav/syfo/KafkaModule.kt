@@ -178,6 +178,7 @@ suspend fun pollAndProcessOppfolgingstilfelleTopic(
             oppfolgingstilfelleService.receiveOppfolgingstilfelle(oppfolgingstilfellePeker, callId)
         }
     }
+    kafkaConsumer.commitSync()
     delay(100)
 }
 
