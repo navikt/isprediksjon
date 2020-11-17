@@ -8,7 +8,6 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.server.testing.*
 import io.ktor.util.*
 import io.mockk.every
-import io.mockk.justRun
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import no.nav.common.KafkaEnvironment
@@ -129,7 +128,6 @@ object KafkaOppfolgingstilfelleSpek : Spek({
                 )
 
                 val mockConsumer = mockk<KafkaConsumer<String, String>>()
-                justRun { mockConsumer.commitSync() }
                 every { mockConsumer.poll(Duration.ofMillis(0)) } returns ConsumerRecords(
                     mapOf(oppfolgingstilfelleTopicPartition to listOf(oppfolgingstilfellePekerRecord))
                 )

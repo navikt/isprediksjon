@@ -33,7 +33,7 @@ fun kafkaConsumerOppfolgingstilfelleProperties(
 ) = Properties().apply {
     this[ConsumerConfig.GROUP_ID_CONFIG] = "${env.applicationName}-consumer2"
     this[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "latest"
-    this[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = false
+    this[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = true
     this[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "50"
     this[CommonClientConfigs.RETRIES_CONFIG] = "2"
     this["acks"] = "all"
