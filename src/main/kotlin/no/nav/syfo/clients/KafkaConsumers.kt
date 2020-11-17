@@ -13,6 +13,7 @@ fun kafkaConsumerSmregProperties(
 ) = Properties().apply {
     this[ConsumerConfig.GROUP_ID_CONFIG] = "${env.applicationName}-consumer2"
     this[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
+    this[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "50"
     this[CommonClientConfigs.RETRIES_CONFIG] = "2"
     this["acks"] = "all"
     this["security.protocol"] = "SASL_SSL"
@@ -33,6 +34,7 @@ fun kafkaConsumerOppfolgingstilfelleProperties(
     this[ConsumerConfig.GROUP_ID_CONFIG] = "${env.applicationName}-consumer2"
     this[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "latest"
     this[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = false
+    this[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "50"
     this[CommonClientConfigs.RETRIES_CONFIG] = "2"
     this["acks"] = "all"
     this["security.protocol"] = "SASL_SSL"
