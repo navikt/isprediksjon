@@ -55,7 +55,7 @@ class AktorregisterMock {
                         UserConstants.ARBEIDSTAKER_AKTORID_FINNES_IKKE.value -> {
                             call.respond(
                                 mapOf(
-                                    UserConstants.ARBEIDSTAKER_AKTORID.value to RSAktor(
+                                    UserConstants.ARBEIDSTAKER_AKTORID_FINNES_IKKE.value to RSAktor(
                                         null,
                                         feilmelding = NO_IDENT_ERROR_MSG
                                     )
