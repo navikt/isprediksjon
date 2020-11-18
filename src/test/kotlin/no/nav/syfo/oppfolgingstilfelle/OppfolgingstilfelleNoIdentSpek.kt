@@ -13,12 +13,11 @@ import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import testutil.TestDB
-import testutil.UserConstants.ARBEIDSTAKER_FNR
+import testutil.UserConstants.ARBEIDSTAKER_AKTORID_FINNES_IKKE
 import testutil.dropData
-import testutil.generator.generateKOppfolgingstilfellePeker
+import testutil.generator.generateKOppfolgingstilfellePekerPersonFinnesIkke
 import testutil.getPrediksjonInput
 import testutil.mock.*
-import testutil.mock.AktorregisterNoidentMock
 import testutil.vaultSecrets
 
 @InternalAPI
@@ -38,7 +37,7 @@ object OppfolgingstilfelleNoIdentSpek : Spek({
             serviceuserPassword = vaultSecrets.serviceuserPassword
         )
 
-        val aktorregisterNoidentMock = AktorregisterNoidentMock()
+        val aktorregisterNoidentMock = AktorregisterMock()
         val aktorregisterClient = AktorregisterClient(
             baseUrl = aktorregisterNoidentMock.url,
             stsRestClient = stsRestClient
@@ -79,16 +78,16 @@ object OppfolgingstilfelleNoIdentSpek : Spek({
 
         describe("Read and store PPrediksjonInput") {
 
-            val kOppfolgingstilfellePeker = generateKOppfolgingstilfellePeker
-            val kOppfolgingstilfellePerson = syketilfelleMock.kOppfolgingstilfellePerson
+            val kOppfolgingstilfellePeker = generateKOppfolgingstilfellePekerPersonFinnesIkke
+            val kOppfolgingstilfellePerson = syketilfelleMock.kOppfolgingstilfellePerson // TODO Kan denne bare fjernes?
 
-            it("should skip Oppfolgingstilfelle when no Ident is present") {
+            it("should skip Oppfolgingstilfelle when no Ident is present") { // TODO Kan hele denne 'it'en flyttes inn i den testen som fantes fra før nå?
                 runBlocking {
                     oppfolgingstilfelleService.receiveOppfolgingstilfelle(kOppfolgingstilfellePeker)
                 }
 
                 val prediksjonInputFnrList =
-                    database.connection.getPrediksjonInput(ARBEIDSTAKER_FNR)
+                    database.connection.getPrediksjonInput(ARBEIDSTAKER_AKTORID_FINNES_IKKE)
 
                 prediksjonInputFnrList.size shouldBeEqualTo 0
 

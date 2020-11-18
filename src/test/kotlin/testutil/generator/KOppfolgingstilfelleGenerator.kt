@@ -5,6 +5,7 @@ import no.nav.syfo.clients.syketilfelle.domain.KSyketilfelledag
 import no.nav.syfo.oppfolgingstilfelle.domain.DAYS_START_CANDIDATE
 import no.nav.syfo.oppfolgingstilfelle.domain.KOppfolgingstilfellePeker
 import testutil.UserConstants.ARBEIDSTAKER_AKTORID
+import testutil.UserConstants.ARBEIDSTAKER_AKTORID_FINNES_IKKE
 import testutil.UserConstants.VIRKSOMHETSNUMMER
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -12,6 +13,12 @@ import java.time.LocalDateTime
 val generateKOppfolgingstilfellePeker =
     KOppfolgingstilfellePeker(
         aktorId = ARBEIDSTAKER_AKTORID.value,
+        orgnummer = VIRKSOMHETSNUMMER
+    ).copy()
+
+val generateKOppfolgingstilfellePekerPersonFinnesIkke =
+    KOppfolgingstilfellePeker(
+        aktorId = ARBEIDSTAKER_AKTORID_FINNES_IKKE.value,
         orgnummer = VIRKSOMHETSNUMMER
     ).copy()
 

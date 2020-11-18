@@ -11,6 +11,7 @@ import no.nav.syfo.clients.aktor.IdentType
 import no.nav.syfo.util.NAV_PERSONIDENTER
 import testutil.UserConstants
 import testutil.getRandomPort
+import no.nav.syfo.clients.aktor.domain.NO_IDENT_ERROR_MSG
 
 class AktorregisterMock {
     private val port = getRandomPort()
@@ -47,6 +48,16 @@ class AktorregisterMock {
                                             )
                                         ),
                                         feilmelding = null
+                                    )
+                                )
+                            )
+                        }
+                        UserConstants.ARBEIDSTAKER_AKTORID_FINNES_IKKE.value -> {
+                            call.respond(
+                                mapOf(
+                                    UserConstants.ARBEIDSTAKER_AKTORID.value to RSAktor(
+                                        null,
+                                        feilmelding = NO_IDENT_ERROR_MSG
                                     )
                                 )
                             )
