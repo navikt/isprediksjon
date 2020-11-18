@@ -53,8 +53,14 @@ class AktorregisterClient(
                 Either.Left(errorMessage)
             }
             identResponse.identer.isNullOrEmpty() -> {
-                val errorMessage = "Lookup gjeldende identer feilet med feilmelding ${identResponse.feilmelding}"
-                LOG.error(errorMessage)
+
+                var errorMessage = "Lookup gjeldende identer feilet med feilmelding ${identResponse.feilmelding}"
+                if (identResponse.feilmelding.equals("Den angitte personidenten finnes ikke")) {
+                    LOG.warn(errorMessage)
+                    errorMessage = identResponse.feilmelding!!
+                } else {
+                    LOG.error(errorMessage)
+                }
                 Either.Left(errorMessage)
             }
             else -> {
