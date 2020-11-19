@@ -56,9 +56,9 @@ class AktorregisterClient(
             identResponse.identer.isNullOrEmpty() -> {
 
                 var errorMessage = "Lookup gjeldende identer feilet med feilmelding ${identResponse.feilmelding}"
-                if (identResponse.feilmelding.equals(NO_IDENT_ERROR_MSG)) {
+                if (identResponse.feilmelding == NO_IDENT_ERROR_MSG) {
                     LOG.warn(errorMessage)
-                    errorMessage = identResponse.feilmelding!!
+                    errorMessage = identResponse.feilmelding
                 } else {
                     LOG.error(errorMessage)
                 }
