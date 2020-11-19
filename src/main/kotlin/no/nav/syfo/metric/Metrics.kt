@@ -1,6 +1,7 @@
 package no.nav.syfo.metric
 
 import io.prometheus.client.Counter
+import io.prometheus.client.Histogram
 
 const val METRICS_NS = "isprediksjon"
 
@@ -42,4 +43,11 @@ val COUNT_PREDIKSJON_INPUT_CREATED: Counter = Counter.build()
     .namespace(METRICS_NS)
     .name(PREDIKSJON_INPUT_CREATED)
     .help("Counts the number of PrediksjonInput stored in database")
+    .register()
+
+const val OPPFOLGINGSTILFELLE_DURATION = "oppfolgingstilfelle_duration_histogram"
+val HISTOGRAM_OPPFOLGINGSTILFELLE_DURATION: Histogram = Histogram.build()
+    .namespace(METRICS_NS)
+    .name(OPPFOLGINGSTILFELLE_DURATION)
+    .help("Measure the current time it takes to handle an event oppfolgingstilfelle ")
     .register()

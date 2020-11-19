@@ -13,6 +13,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import no.nav.syfo.clients.aktor.domain.IdentinfoListe
+import no.nav.syfo.clients.aktor.domain.NO_IDENT_ERROR_MSG
 import no.nav.syfo.clients.sts.StsRestClient
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
@@ -53,8 +54,14 @@ class AktorregisterClient(
                 Either.Left(errorMessage)
             }
             identResponse.identer.isNullOrEmpty() -> {
-                val errorMessage = "Lookup gjeldende identer feilet med feilmelding ${identResponse.feilmelding}"
-                LOG.error(errorMessage)
+
+                var errorMessage = "Lookup gjeldende identer feilet med feilmelding ${identResponse.feilmelding}"
+                if (identResponse.feilmelding == NO_IDENT_ERROR_MSG) {
+                    LOG.warn(errorMessage)
+                    errorMessage = identResponse.feilmelding
+                } else {
+                    LOG.error(errorMessage)
+                }
                 Either.Left(errorMessage)
             }
             else -> {

@@ -17,6 +17,7 @@ import no.nav.syfo.clients.aktor.AktorregisterClient
 import no.nav.syfo.clients.sts.StsRestClient
 import no.nav.syfo.clients.syketilfelle.SyketilfelleClient
 import no.nav.syfo.database.DatabaseInterface
+import no.nav.syfo.metric.HISTOGRAM_OPPFOLGINGSTILFELLE_DURATION
 import no.nav.syfo.oppfolgingstilfelle.OppfolgingstilfelleService
 import no.nav.syfo.oppfolgingstilfelle.domain.KOppfolgingstilfellePeker
 import no.nav.syfo.persistence.handleReceivedMessage
@@ -162,6 +163,8 @@ suspend fun pollAndProcessOppfolgingstilfelleTopic(
     }
 
     kafkaConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
+        val oppfolgingstilfelleTimer = HISTOGRAM_OPPFOLGINGSTILFELLE_DURATION.startTimer()
+
         val callId = kafkaCallIdOppfolgingstilfelle()
         val oppfolgingstilfellePeker: KOppfolgingstilfellePeker = objectMapper.readValue(consumerRecord.value())
 
@@ -177,6 +180,7 @@ suspend fun pollAndProcessOppfolgingstilfelleTopic(
         if (isProcessOppfolgingstilfelleOn) {
             oppfolgingstilfelleService.receiveOppfolgingstilfelle(oppfolgingstilfellePeker, callId)
         }
+        oppfolgingstilfelleTimer.observeDuration()
     }
     delay(100)
 }
