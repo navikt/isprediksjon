@@ -12,7 +12,7 @@ fun kafkaConsumerSmregProperties(
     vaultSecrets: VaultSecrets
 ) = Properties().apply {
     this[ConsumerConfig.GROUP_ID_CONFIG] = "${env.applicationName}-consumer3"
-    this[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
+    this[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "none"
     this[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "50"
     this[CommonClientConfigs.RETRIES_CONFIG] = "2"
     this["acks"] = "all"
