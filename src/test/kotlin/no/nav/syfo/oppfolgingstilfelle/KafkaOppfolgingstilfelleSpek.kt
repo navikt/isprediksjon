@@ -117,7 +117,7 @@ object KafkaOppfolgingstilfelleSpek : Spek({
             val partition = 0
             val oppfolgingstilfelleTopicPartition = TopicPartition(oppfolgingstilfelleTopic, partition)
 
-            it("should store PrediksjonInput based on OppfolgingstilfellePeker") {
+            xit("should store PrediksjonInput based on OppfolgingstilfellePeker") {
                 val kOppfolgingstilfellePekerJson = objectMapper.writeValueAsString(kOppfolgingstilfellePeker)
                 val oppfolgingstilfellePekerRecord = ConsumerRecord(
                     oppfolgingstilfelleTopic,

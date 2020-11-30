@@ -26,6 +26,10 @@ import no.nav.syfo.util.callIdArgument
 import no.nav.syfo.util.kafkaCallIdOppfolgingstilfelle
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import java.time.Duration
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.*
 
 fun Application.kafkaModule(
     applicationState: ApplicationState,
@@ -178,7 +182,17 @@ suspend fun pollAndProcessOppfolgingstilfelleTopic(
             callIdArgument(callId)
         )
         if (isProcessOppfolgingstilfelleOn) {
-            oppfolgingstilfelleService.receiveOppfolgingstilfelle(oppfolgingstilfellePeker, callId)
+            val recordTimestamp = consumerRecord.timestamp()
+            val recordLocalDateTime: LocalDateTime = LocalDateTime.ofInstant(
+                Instant.ofEpochMilli(recordTimestamp),
+                TimeZone.getDefault().toZoneId()
+            )
+            val septemberStart = LocalDate.now().minusDays(90).atStartOfDay()
+            val isRecordPublishedAfterAugust2020 = recordLocalDateTime.isAfter(septemberStart)
+            if (isRecordPublishedAfterAugust2020) {
+                log.info("JTRACE: recordLocalDateTime $recordLocalDateTime")
+                oppfolgingstilfelleService.receiveOppfolgingstilfelle(oppfolgingstilfellePeker, callId)
+            }
         }
         oppfolgingstilfelleTimer.observeDuration()
     }
