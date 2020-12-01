@@ -24,7 +24,9 @@ import no.nav.syfo.persistence.handleReceivedMessage
 import no.nav.syfo.prediksjon.PrediksjonInputService
 import no.nav.syfo.util.callIdArgument
 import no.nav.syfo.util.kafkaCallIdOppfolgingstilfelle
+import org.apache.kafka.clients.consumer.ConsumerRebalanceListener
 import org.apache.kafka.clients.consumer.KafkaConsumer
+import org.apache.kafka.common.TopicPartition
 import java.time.Duration
 
 fun Application.kafkaModule(
@@ -77,9 +79,25 @@ suspend fun launchListeners(
     createListener(applicationState) {
         val kafkaConsumerOppfolgingstilfelle = kafkaConsumers.kafkaConsumerOppfolgingstilfelle
 
+        val subscriptionCallback = object : ConsumerRebalanceListener {
+            override fun onPartitionsAssigned(partitions: MutableCollection<TopicPartition>?) {
+                val offset = 2093680L
+                log.info("JTRACE: onPartitionsAssigned called for ${partitions?.size ?: 0} partitions. Seeking to beginning.")
+                partitions?.forEach {
+                    kafkaConsumerOppfolgingstilfelle.seek(it, offset)
+                    log.info("JTRACE: sekk to offset $offset")
+                }
+            }
+
+            override fun onPartitionsRevoked(partitions: MutableCollection<TopicPartition>?) {}
+        }
+
         val oppfolgingstilfelleTopic = env.oppfolgingstilfelleTopic
         log.info("Subscribing to topic: $oppfolgingstilfelleTopic")
-        kafkaConsumerOppfolgingstilfelle.subscribe(listOf(oppfolgingstilfelleTopic))
+        kafkaConsumerOppfolgingstilfelle.subscribe(
+            listOf(oppfolgingstilfelleTopic),
+            subscriptionCallback
+        )
         blockingApplicationLogic(
             applicationState,
             kafkaConsumerOppfolgingstilfelle,
@@ -182,6 +200,7 @@ suspend fun pollAndProcessOppfolgingstilfelleTopic(
         }
         oppfolgingstilfelleTimer.observeDuration()
     }
+    kafkaConsumer.commitSync()
     delay(100)
 }
 
