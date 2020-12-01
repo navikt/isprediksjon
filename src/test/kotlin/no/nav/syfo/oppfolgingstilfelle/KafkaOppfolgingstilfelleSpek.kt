@@ -129,7 +129,7 @@ object KafkaOppfolgingstilfelleSpek : Spek({
                 )
 
                 val mockConsumer = mockk<KafkaConsumer<String, String>>()
-                every { mockConsumer.poll(Duration.ofMillis(0)) } returns ConsumerRecords(
+                every { mockConsumer.poll(Duration.ofMillis(100)) } returns ConsumerRecords(
                     mapOf(oppfolgingstilfelleTopicPartition to listOf(oppfolgingstilfellePekerRecord))
                 )
 
