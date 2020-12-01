@@ -180,7 +180,7 @@ suspend fun pollAndProcessOppfolgingstilfelleTopic(
         "{}"
     }
 
-    kafkaConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
+    kafkaConsumer.poll(Duration.ofMillis(100)).forEach { consumerRecord ->
         val oppfolgingstilfelleTimer = HISTOGRAM_OPPFOLGINGSTILFELLE_DURATION.startTimer()
 
         val callId = kafkaCallIdOppfolgingstilfelle()
@@ -200,7 +200,6 @@ suspend fun pollAndProcessOppfolgingstilfelleTopic(
         }
         oppfolgingstilfelleTimer.observeDuration()
     }
-    kafkaConsumer.commitSync()
     delay(100)
 }
 
