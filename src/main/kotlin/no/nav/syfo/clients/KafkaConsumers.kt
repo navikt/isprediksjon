@@ -31,7 +31,7 @@ fun kafkaConsumerOppfolgingstilfelleProperties(
     env: Environment,
     vaultSecrets: VaultSecrets
 ) = Properties().apply {
-    this[ConsumerConfig.GROUP_ID_CONFIG] = "${env.applicationName}-consumer-tilfeller"
+    this[ConsumerConfig.GROUP_ID_CONFIG] = "${env.applicationName}-consumer-6"
     this[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "latest"
     this[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = true
     this[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "1"
