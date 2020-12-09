@@ -22,7 +22,7 @@ class AktorregisterClient(
     private val baseUrl: String,
     private val stsRestClient: StsRestClient
 ) {
-    private val client = HttpClient(CIO) {
+    private val clientConfig: HttpClientConfig<CIOEngineConfig>.() -> Unit = {
         install(JsonFeature) {
             serializer = JacksonSerializer {
                 registerKotlinModule()
@@ -36,12 +36,14 @@ class AktorregisterClient(
         val bearer = stsRestClient.token()
 
         val url = "$baseUrl/identer?gjeldende=true"
-        val response: HttpResponse = client.get(url) {
-            header(HttpHeaders.Authorization, bearerHeader(bearer))
-            header(NAV_CALL_ID, callId)
-            header(NAV_CONSUMER_ID, APP_CONSUMER_ID)
-            header(NAV_PERSONIDENTER, ident)
-            accept(ContentType.Application.Json)
+        val response: HttpResponse = HttpClient(CIO, clientConfig).use {
+            it.get(url) {
+                header(HttpHeaders.Authorization, bearerHeader(bearer))
+                header(NAV_CALL_ID, callId)
+                header(NAV_CONSUMER_ID, APP_CONSUMER_ID)
+                header(NAV_PERSONIDENTER, ident)
+                accept(ContentType.Application.Json)
+            }
         }
 
         val mapResponse = response.receive<Map<String, IdentinfoListe>>()

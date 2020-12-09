@@ -18,7 +18,7 @@ class StsRestClient(
     private val serviceuserUsername: String,
     private val serviceuserPassword: String
 ) {
-    private val client = HttpClient(CIO) {
+    private val clientConfig: HttpClientConfig<CIOEngineConfig>.() -> Unit = {
         install(JsonFeature) {
             serializer = JacksonSerializer {
                 registerKotlinModule()
@@ -33,9 +33,11 @@ class StsRestClient(
     suspend fun token(): String {
         if (Token.shouldRenew(cachedOidcToken)) {
             val url = "$baseUrl/rest/v1/sts/token?grant_type=client_credentials&scope=openid"
-            val response: HttpResponse = client.get(url) {
-                header(HttpHeaders.Authorization, basicHeader(serviceuserUsername, serviceuserPassword))
-                accept(ContentType.Application.Json)
+            val response: HttpResponse = HttpClient(CIO, clientConfig).use { client ->
+                client.get(url) {
+                    header(HttpHeaders.Authorization, basicHeader(serviceuserUsername, serviceuserPassword))
+                    accept(ContentType.Application.Json)
+                }
             }
 
             cachedOidcToken = response.receive<Token>()

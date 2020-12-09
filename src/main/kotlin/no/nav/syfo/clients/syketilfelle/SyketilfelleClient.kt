@@ -27,7 +27,7 @@ class SyketilfelleClient(
     private val baseUrl: String,
     private val stsRestClient: StsRestClient
 ) {
-    private val client = HttpClient(CIO) {
+    private val clientConfig: HttpClientConfig<CIOEngineConfig>.() -> Unit = {
         install(JsonFeature) {
             serializer = JacksonSerializer {
                 registerKotlinModule()
@@ -46,11 +46,13 @@ class SyketilfelleClient(
     ): KOppfolgingstilfellePerson? {
         val bearer = stsRestClient.token()
 
-        val response: HttpResponse = client.get(getSyfosyketilfelleUrl(aktorId)) {
-            header(HttpHeaders.Authorization, bearerHeader(bearer))
-            header(NAV_CALL_ID, callId)
-            header(NAV_CONSUMER_ID, APP_CONSUMER_ID)
-            accept(ContentType.Application.Json)
+        val response: HttpResponse = HttpClient(CIO, clientConfig).use {
+            it.get(getSyfosyketilfelleUrl(aktorId)) {
+                header(HttpHeaders.Authorization, bearerHeader(bearer))
+                header(NAV_CALL_ID, callId)
+                header(NAV_CONSUMER_ID, APP_CONSUMER_ID)
+                accept(ContentType.Application.Json)
+            }
         }
 
         when (response.status) {
