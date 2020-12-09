@@ -6,6 +6,7 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -32,6 +33,9 @@ class SyketilfelleClient(
                 registerKotlinModule()
                 registerModule(JavaTimeModule())
                 configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            }
+            install(HttpTimeout) {
+                requestTimeoutMillis = 5000
             }
         }
     }
