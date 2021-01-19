@@ -8,7 +8,7 @@ version = "1.0.0"
 object Versions {
     const val arrowVersion = "0.9.0"
     const val coroutinesVersion = "1.4.2"
-    const val flywayVersion = "6.5.7"
+    const val flywayVersion = "7.5.0"
     const val hikariVersion = "3.4.5"
     const val jacksonVersion = "2.11.3"
     const val kafkaVersion = "2.3.1"

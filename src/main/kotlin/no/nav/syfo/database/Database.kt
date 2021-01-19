@@ -28,7 +28,7 @@ class ProdDatabase(dbConfig: DbConfig, initBlock: (context: Database) -> Unit) :
         Flyway.configure().run {
             dataSource(jdbcUrl, username, password)
             initSql("SET ROLE \"${dbConfig.databaseName}-${Role.ADMIN}\"") // required for assigning proper owners for the tables
-            load().migrate()
+            load().migrate().migrationsExecuted
         }
 }
 
@@ -73,7 +73,7 @@ abstract class Database(val dbConfig: DbConfig, private val initBlock: ((context
 
     open fun runFlywayMigrations(jdbcUrl: String, username: String, password: String) = Flyway.configure().run {
         dataSource(jdbcUrl, username, password)
-        load().migrate()
+        load().migrate().migrationsExecuted
     }
 }
 
