@@ -17,7 +17,7 @@ object Versions {
     const val ktorVersion = "1.4.3"
     const val logbackVersion = "1.2.3"
     const val logstashEncoderVersion = "6.3"
-    const val mockkVersion = "1.10.0"
+    const val mockkVersion = "1.10.5"
     const val postgresVersion = "42.2.18"
     const val postgresTestContainersVersion = "1.15.1"
     const val prometheusVersion = "0.9.0"
