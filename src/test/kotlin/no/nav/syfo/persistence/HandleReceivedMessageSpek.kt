@@ -100,8 +100,9 @@ object HandleReceivedMessageSpek : Spek({
                     )
 
                     it("should store data from record") {
+                        val endOffsets: Map<TopicPartition, Long> = mutableMapOf(Pair(sykmeldingTopicPartition, 2))
                         mockConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
-                            handleReceivedMessage(database, env, consumerRecord)
+                            handleReceivedMessage(database, env, consumerRecord, endOffsets)
                         }
 
                         val sykmeldingListe: List<String> = database.connection.getSM(table, sykmeldingRecord.key())
