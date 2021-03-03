@@ -125,8 +125,9 @@ suspend fun blockingApplicationLogic(
     kafkaConsumer: KafkaConsumer<String, String>
 ) {
     while (applicationState.ready) {
+        val endOffsets = kafkaConsumer.endOffsets(kafkaConsumer.assignment())
         kafkaConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
-            handleReceivedMessage(database, env, consumerRecord)
+            handleReceivedMessage(database, env, consumerRecord, endOffsets)
         }
         delay(100)
     }
