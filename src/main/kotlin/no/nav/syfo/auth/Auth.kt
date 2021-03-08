@@ -19,11 +19,7 @@ import org.apache.http.impl.conn.SystemDefaultRoutePlanner
 import java.net.ProxySelector
 
 fun Application.auth(wellKnown: WellKnown, acceptedAudienceList: List<String>) {
-    log.info("Initialization of auth starting")
-
-    val jwkProvider = JwkProviderBuilder(
-        URL(wellKnown.jwks_uri)
-    )
+    val jwkProvider = JwkProviderBuilder(URL(wellKnown.jwks_uri))
         .cached(10, 24, TimeUnit.HOURS)
         .rateLimited(10, 1, TimeUnit.MINUTES)
         .build()
