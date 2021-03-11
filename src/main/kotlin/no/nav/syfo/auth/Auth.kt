@@ -19,7 +19,7 @@ fun Application.auth(env: Environment) {
         jwt {
             verifier(jwkProvider, jwkIssuer)
             validate { credentials ->
-                if (hasExpectedAudience(credentials, listOf(env.clientId))) {
+                if (hasExpectedAudience(credentials, listOf(env.loginserviceClientId))) {
                     JWTPrincipal(credentials.payload)
                 } else {
                     log.warn(

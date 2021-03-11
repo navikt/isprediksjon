@@ -21,6 +21,8 @@ fun testEnvironment(port: Int, kafkaBootstrapServers: String) = Environment(
     isprediksjonDBURL = "12314.adeo.no",
     aktorregisterV1Url = "http://aktorregister",
     stsRestUrl = "http://stsrest",
+    loginserviceClientId = "1234",
+    aadDiscoveryUrl = "",
     syketilfelleUrl = "http://syfosyketilfelle:0001"
 )
 
