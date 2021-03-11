@@ -4,6 +4,9 @@ data class Environment(
     val applicationName: String = getEnvVar("NAIS_APP_NAME", "isprediksjon"),
     val applicationPort: Int = getEnvVar("APPLICATION_PORT", "8080").toInt(),
 
+    val clientId: String = getEnvVar("LOGINSERVICE_CLIENT_ID", defaultValue = "1234"),
+    val aadDiscoveryUrl: String = getEnvVar("AADDISCOVERY_URL"),
+
     val kafkaBootstrapServers: String = getEnvVar("KAFKA_BOOTSTRAP_SERVERS_URL"),
     val oppfolgingstilfelleTopic: String = "aapen-syfo-oppfolgingstilfelle-v1",
     val sm2013ManuellBehandlingTopic: String = getEnvVar("KAFKA_SM2013_MANUELL_BEHANDLING", "privat-syfo-sm2013-manuellBehandling"),
