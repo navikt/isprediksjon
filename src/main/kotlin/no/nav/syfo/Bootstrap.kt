@@ -9,6 +9,7 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.slf4j.MDCContext
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.auth.auth
+import no.nav.syfo.auth.getWellKnown
 import no.nav.syfo.database.VaultCredentialService
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.vault.RenewVaultService
@@ -52,7 +53,7 @@ fun main() {
             applicationState.alive = true
 
             module {
-                auth(env)
+                auth(getWellKnown(env.aadDiscoveryUrl), listOf(env.loginserviceClientId))
                 serverModule(applicationState)
                 databaseModule(
                     applicationState,
