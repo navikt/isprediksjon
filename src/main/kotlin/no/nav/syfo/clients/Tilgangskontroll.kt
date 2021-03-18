@@ -17,7 +17,7 @@ class Tilgangskontroll(env: Environment) {
 
     private val domain = if (env.developmentMode) "nais.preprod.local" else "nais.adeo.no"
     private val url: String =
-        "http://syfo-tilgangskontroll.${domain}/syfo-tilgangskontroll/api/tilgang/bruker"
+        "http://syfo-tilgangskontroll.$domain/syfo-tilgangskontroll/api/tilgang/bruker"
 
     data class Tilgang(val harTilgang: Boolean, val begrunnelse: String? = null)
 
