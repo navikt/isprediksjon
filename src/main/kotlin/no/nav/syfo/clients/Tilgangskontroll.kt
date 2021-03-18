@@ -8,13 +8,16 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
+import no.nav.syfo.Environment
 import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.util.bearerHeader
 import org.slf4j.LoggerFactory
 
-class Tilgangskontroll(
-    private val url: String = "http://syfo-tilgangskontroll/syfo-tilgangskontroll/api/tilgang/bruker"
-) {
+class Tilgangskontroll(env: Environment) {
+
+    private val domain = if (env.developmentMode) "nais.preprod.local" else "nais.adeo.no"
+    private val url: String =
+        "http://syfo-tilgangskontroll.${domain}/syfo-tilgangskontroll/api/tilgang/bruker"
 
     data class Tilgang(val harTilgang: Boolean, val begrunnelse: String? = null)
 

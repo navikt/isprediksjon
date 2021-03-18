@@ -4,6 +4,7 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import no.nav.syfo.Environment
 import no.nav.syfo.clients.Tilgangskontroll
 import no.nav.syfo.database.DatabaseInterface
 import no.nav.syfo.domain.AktorId
@@ -13,8 +14,8 @@ import no.nav.syfo.prediksjon.getPrediksjon
 const val apiBasePath = "/api/v1"
 const val apiPrediksjon = "/prediksjon"
 
-fun Route.registerPrediksjon(database: DatabaseInterface) {
-    val tilgangskontroll = Tilgangskontroll()
+fun Route.registerPrediksjon(database: DatabaseInterface, env: Environment) {
+    val tilgangskontroll = Tilgangskontroll(env)
     route(apiBasePath) {
         get(apiPrediksjon) {
             val token = call.request.headers[HttpHeaders.Authorization]?.removePrefix("Bearer ")
