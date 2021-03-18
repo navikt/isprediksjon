@@ -4,7 +4,6 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import no.nav.syfo.Environment
 import no.nav.syfo.clients.Tilgangskontroll
 import no.nav.syfo.database.DatabaseInterface
 import no.nav.syfo.domain.AktorId
