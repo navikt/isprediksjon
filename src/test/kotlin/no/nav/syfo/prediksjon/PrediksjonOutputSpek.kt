@@ -48,7 +48,7 @@ object PrediksjonOutputSpek : Spek({
                 1
             )
             it("Should return 1 prediksjon ") {
-                val prediksjonList = database.getPrediksjon(fnr, aktorid)
+                val prediksjonList = database.getPrediksjon(fnr)
 
                 prediksjonList.size shouldBeEqualTo 1
             }

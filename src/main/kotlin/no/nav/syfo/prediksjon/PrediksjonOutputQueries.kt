@@ -9,7 +9,7 @@ import no.nav.syfo.domain.Fodselsnummer
 import java.sql.ResultSet
 import java.time.ZoneOffset
 
-const val queryHentPrediksjon = "SELECT * FROM prediksjon_output WHERE fnr = ? AND aktorid = ?"
+const val queryHentPrediksjon = "SELECT * FROM prediksjon_output WHERE fnr = ?"
 
 fun ResultSet.toPrediksjon(): Prediksjon {
     val mapper = jacksonObjectMapper()
@@ -25,11 +25,10 @@ fun ResultSet.toPrediksjon(): Prediksjon {
     )
 }
 
-fun DatabaseInterface.getPrediksjon(fnr: Fodselsnummer, aktorId: AktorId): List<Prediksjon> {
+fun DatabaseInterface.getPrediksjon(fnr: Fodselsnummer): List<Prediksjon> {
     return connection.use {
         connection.prepareStatement(queryHentPrediksjon).use {
             it.setString(1, fnr.value)
-            it.setString(2, aktorId.value)
             it.executeQuery().toList {
                 toPrediksjon()
             }
