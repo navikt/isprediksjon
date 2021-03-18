@@ -13,9 +13,9 @@ import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.util.bearerHeader
 import org.slf4j.LoggerFactory
 
-class Tilgangskontroll(env: Environment) {
+class Tilgangskontroll(isDev: Boolean) {
 
-    private val domain = if (env.developmentMode) "nais.preprod.local" else "nais.adeo.no"
+    val domain = if (isDev) "nais.preprod.local" else "nais.adeo.no"
     private val url: String =
         "http://syfo-tilgangskontroll.$domain/syfo-tilgangskontroll/api/tilgang/bruker"
 

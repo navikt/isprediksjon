@@ -15,7 +15,8 @@ const val apiBasePath = "/api/v1"
 const val apiPrediksjon = "/prediksjon"
 
 fun Route.registerPrediksjon(database: DatabaseInterface, env: Environment) {
-    val tilgangskontroll = Tilgangskontroll(env)
+
+    val tilgangskontroll = Tilgangskontroll(env.developmentMode)
     route(apiBasePath) {
         get(apiPrediksjon) {
             val token = call.request.headers[HttpHeaders.Authorization]?.removePrefix("Bearer ")
