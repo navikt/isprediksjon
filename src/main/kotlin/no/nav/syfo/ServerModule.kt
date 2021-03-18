@@ -5,6 +5,7 @@ import io.ktor.routing.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.api.registerNaisApi
 import no.nav.syfo.application.api.registerPrediksjon
+import no.nav.syfo.clients.Tilgangskontroll
 import no.nav.syfo.database.DatabaseInterface
 
 fun Application.serverModule(
@@ -16,7 +17,7 @@ fun Application.serverModule(
 
     routing {
         registerNaisApi(applicationState)
-        registerPrediksjon(db, env)
+        registerPrediksjon(db, Tilgangskontroll(env.developmentMode))
     }
     log.info("Initialization of server module done")
 }
