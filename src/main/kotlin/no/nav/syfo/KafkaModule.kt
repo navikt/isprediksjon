@@ -32,6 +32,8 @@ fun Application.kafkaModule(
     env: Environment,
     vaultSecrets: VaultSecrets
 ) {
+    log.info("Initialization of kafka module starting")
+
     val stsRestClient = StsRestClient(
         baseUrl = env.stsRestUrl,
         serviceuserUsername = vaultSecrets.serviceuserUsername,
@@ -64,6 +66,7 @@ fun Application.kafkaModule(
             oppfolgingstilfelleService
         )
     }
+    log.info("Initialization of kafka module done")
 }
 
 @KtorExperimentalAPI
@@ -125,9 +128,8 @@ suspend fun blockingApplicationLogic(
     kafkaConsumer: KafkaConsumer<String, String>
 ) {
     while (applicationState.ready) {
-        val endOffsets = kafkaConsumer.endOffsets(kafkaConsumer.assignment())
         kafkaConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
-            handleReceivedMessage(database, env, consumerRecord, endOffsets)
+            handleReceivedMessage(database, env, consumerRecord)
         }
         delay(100)
     }

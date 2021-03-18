@@ -10,6 +10,8 @@ fun Application.databaseModule(
     env: Environment,
     vaultCredentialService: VaultCredentialService
 ) {
+    log.info("Initialization of database starting")
+
     val newCredentials = vaultCredentialService.getNewCredentials(
         env.databaseMountPathVault,
         env.databaseName,
@@ -38,4 +40,5 @@ fun Application.databaseModule(
 
         applicationState.ready = true
     }
+    log.info("Initialization of database done")
 }

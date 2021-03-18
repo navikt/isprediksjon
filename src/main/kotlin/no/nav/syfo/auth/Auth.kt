@@ -8,15 +8,19 @@ import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
 import io.ktor.client.*
-import io.ktor.client.engine.cio.*
+import io.ktor.client.engine.apache.*
 import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.runBlocking
 import net.logstash.logback.argument.StructuredArguments
 import java.net.URL
 import java.util.concurrent.TimeUnit
+import org.apache.http.impl.conn.SystemDefaultRoutePlanner
+import java.net.ProxySelector
 
 fun Application.auth(wellKnown: WellKnown, acceptedAudienceList: List<String>) {
+    log.info("Initialization of auth starting")
+
     val jwkProvider = JwkProviderBuilder(
         URL(wellKnown.jwks_uri)
     )
@@ -41,6 +45,7 @@ fun Application.auth(wellKnown: WellKnown, acceptedAudienceList: List<String>) {
             }
         }
     }
+    log.info("Initialization of auth done")
 }
 
 fun hasExpectedAudience(credentials: JWTCredential, expectedAudience: List<String>): Boolean {
@@ -54,7 +59,7 @@ data class WellKnown(
     val issuer: String
 )
 
-val proxyConfig: HttpClientConfig<CIOEngineConfig>.() -> Unit = {
+val proxyConfig: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
     install(JsonFeature) {
         serializer = JacksonSerializer {
             registerKotlinModule()
@@ -62,7 +67,12 @@ val proxyConfig: HttpClientConfig<CIOEngineConfig>.() -> Unit = {
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         }
     }
+    engine {
+        customizeClient {
+            setRoutePlanner(SystemDefaultRoutePlanner(ProxySelector.getDefault()))
+        }
+    }
 }
 
 fun getWellKnown(wellKnownUrl: String) =
-    runBlocking { HttpClient(CIO, proxyConfig).use { cli -> cli.get<WellKnown>(wellKnownUrl) } }
+    runBlocking { HttpClient(Apache, proxyConfig).use { cli -> cli.get<WellKnown>(wellKnownUrl) } }

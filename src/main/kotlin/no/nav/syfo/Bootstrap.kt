@@ -51,9 +51,10 @@ fun main() {
             }
 
             applicationState.alive = true
+            val wellKnown = getWellKnown(env.aadDiscoveryUrl)
 
             module {
-                auth(getWellKnown(env.aadDiscoveryUrl), listOf(env.loginserviceClientId))
+                auth(wellKnown, listOf(env.loginserviceClientId))
                 serverModule(applicationState)
                 databaseModule(
                     applicationState,
@@ -68,8 +69,6 @@ fun main() {
             }
 
             log.info("Hello from isprediksjon")
-
-            applicationState.ready = true
         }
     )
 
