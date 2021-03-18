@@ -8,7 +8,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
-import no.nav.syfo.Environment
 import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.util.bearerHeader
 import org.slf4j.LoggerFactory
