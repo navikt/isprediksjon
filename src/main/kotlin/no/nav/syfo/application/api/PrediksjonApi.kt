@@ -5,7 +5,7 @@ import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import no.nav.syfo.clients.Tilgangskontroll
-import no.nav.syfo.database.DatabaseInterface
+import no.nav.syfo.database
 import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.prediksjon.getPrediksjon
 
@@ -13,7 +13,7 @@ const val apiBasePath = "/api/v1"
 const val apiPrediksjon = "/prediksjon"
 const val NAV_PERSONIDENT_HEADER = "nav-personident"
 
-fun Route.registerPrediksjon(database: DatabaseInterface, tilgangskontroll: Tilgangskontroll) {
+fun Route.registerPrediksjon(tilgangskontroll: Tilgangskontroll) {
 
     route(apiBasePath) {
         get(apiPrediksjon) {

@@ -6,7 +6,7 @@ import java.time.OffsetDateTime
 
 data class ForklaringFrontend(val ned: List<String>, val opp: List<String>)
 
-data class Prediksjon(
+data class PrediksjonOutput(
     val fnr: Fodselsnummer,
     val aktorId: AktorId,
     val tilfelleStartDate: OffsetDateTime,

@@ -36,7 +36,7 @@ object PrediksjonOutputSpek : Spek({
             val aktorid = AktorId("2222222222222")
 
             database.createPrediksjonOutputTest(
-                Prediksjon(
+                PrediksjonOutput(
                     fnr,
                     aktorid,
                     OffsetDateTime.now(),
@@ -75,7 +75,7 @@ const val queryCreatePrediksjonOutput =
     """
 
 fun DatabaseInterface.createPrediksjonOutputTest(
-    prediksjon: Prediksjon,
+    prediksjon: PrediksjonOutput,
     inputId: Int
 ): Pair<Int, UUID> {
     val uuid = UUID.randomUUID().toString()

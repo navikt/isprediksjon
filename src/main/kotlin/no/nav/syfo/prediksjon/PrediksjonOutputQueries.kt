@@ -11,10 +11,10 @@ import java.time.ZoneOffset
 
 const val queryHentPrediksjon = "SELECT * FROM prediksjon_output WHERE fnr = ?"
 
-fun ResultSet.toPrediksjon(): Prediksjon {
+fun ResultSet.toPrediksjon(): PrediksjonOutput {
     val mapper = jacksonObjectMapper()
 
-    return Prediksjon(
+    return PrediksjonOutput(
         Fodselsnummer(getString("fnr")),
         AktorId(getString("aktorid")),
         getTimestamp("tilfelle_start_date").toInstant().atOffset(ZoneOffset.UTC),
@@ -25,7 +25,7 @@ fun ResultSet.toPrediksjon(): Prediksjon {
     )
 }
 
-fun DatabaseInterface.getPrediksjon(fnr: Fodselsnummer): List<Prediksjon> {
+fun DatabaseInterface.getPrediksjon(fnr: Fodselsnummer): List<PrediksjonOutput> {
     return connection.use {
         connection.prepareStatement(queryHentPrediksjon).use {
             it.setString(1, fnr.value)

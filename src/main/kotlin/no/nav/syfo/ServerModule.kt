@@ -6,18 +6,16 @@ import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.api.registerNaisApi
 import no.nav.syfo.application.api.registerPrediksjon
 import no.nav.syfo.clients.Tilgangskontroll
-import no.nav.syfo.database.DatabaseInterface
 
 fun Application.serverModule(
     applicationState: ApplicationState,
-    db: DatabaseInterface,
     env: Environment
 ) {
     log.info("Initialization of server module starting")
 
     routing {
         registerNaisApi(applicationState)
-        registerPrediksjon(db, Tilgangskontroll(env.developmentMode))
+        registerPrediksjon(Tilgangskontroll(env.developmentMode))
     }
     log.info("Initialization of server module done")
 }
