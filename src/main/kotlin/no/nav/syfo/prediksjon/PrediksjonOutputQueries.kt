@@ -19,6 +19,7 @@ fun ResultSet.toPrediksjon(): PrediksjonOutput {
         AktorId(getString("aktorid")),
         getTimestamp("tilfelle_start_date").toInstant().atOffset(ZoneOffset.UTC),
         getTimestamp("tilfelle_end_date").toInstant().atOffset(ZoneOffset.UTC),
+        getTimestamp("prediksjon_created").toInstant().atOffset(ZoneOffset.UTC),
         getString("datastate"),
         getFloat("prediksjon_delta"),
         mapper.readValue(getString("forklaring_front_end"))

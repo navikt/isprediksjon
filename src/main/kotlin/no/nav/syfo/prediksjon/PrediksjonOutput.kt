@@ -11,6 +11,7 @@ data class PrediksjonOutput(
     val aktorId: AktorId,
     val tilfelleStartDate: OffsetDateTime,
     val tilfelleEndDate: OffsetDateTime,
+    val prediksjonCreated:  OffsetDateTime,
     val dataState: String,
     val prediksjonDelta: Float,
     val forklaring: ForklaringFrontend

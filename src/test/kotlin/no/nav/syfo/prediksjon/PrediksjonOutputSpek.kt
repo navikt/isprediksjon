@@ -41,6 +41,7 @@ object PrediksjonOutputSpek : Spek({
                     aktorid,
                     OffsetDateTime.now(),
                     OffsetDateTime.now(),
+                    OffsetDateTime.now(),
                     "OK",
                     0.95f,
                     ForklaringFrontend(listOf("diagnosis", "md"), listOf("grad", "time", "hist"))
