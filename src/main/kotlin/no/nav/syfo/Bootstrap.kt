@@ -55,7 +55,7 @@ fun main() {
 
             module {
                 auth(wellKnown, listOf(env.loginserviceClientId))
-                serverModule(applicationState)
+                serverModule(applicationState, env)
                 databaseModule(
                     applicationState,
                     env,
