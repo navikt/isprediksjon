@@ -43,6 +43,7 @@ fun Route.registerPrediksjon(tilgangskontroll: Tilgangskontroll) {
                 }
             } catch (e: Exception) {
                 log.info("L-TRACE: Fikk en exception! :O :( ", e)
+                throw e
             }
         }
     }

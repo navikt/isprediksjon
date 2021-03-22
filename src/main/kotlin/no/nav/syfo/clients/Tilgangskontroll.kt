@@ -45,6 +45,9 @@ class Tilgangskontroll(isDev: Boolean) {
             }
         } catch (e: ServerResponseException) {
             return handleUnexpectedReponseException(e.response)
+        } catch (e: Exception) {
+            log.error("Got an unexpected error when requesting access to person from syfo-tilgangskontroll!", e)
+            throw e
         }
     }
 
