@@ -9,7 +9,6 @@ import no.nav.syfo.database
 import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.prediksjon.getPrediksjon
 import org.slf4j.LoggerFactory
-import java.time.OffsetDateTime
 
 private val log = LoggerFactory.getLogger("no.nav.syfo.application.api.PrediksjonApiKt")
 
