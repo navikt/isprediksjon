@@ -1,6 +1,7 @@
 package no.nav.syfo.application.api
 
 import io.ktor.application.*
+import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import no.nav.syfo.clients.Tilgangskontroll
@@ -17,14 +18,8 @@ fun Route.registerPrediksjon(tilgangskontroll: Tilgangskontroll) {
 
     route(apiBasePath) {
         get(apiPrediksjon) {
-            val prediksjonTing = PrediksjonFrontend(
-                kortereVarighetGrunner = listOf("sykmelding", "lege", "diagnose"),
-                langt = true,
-                lengreVarighetGrunner = listOf("bosted", "favorittfarge", "nedbørsmengde"),
-                prediksjonsDato = OffsetDateTime.now()
-            )
-            log.info("L-TRACE: Returnerer fake prediksjon")
-            call.respond(prediksjonTing)
+            log.info("L-TRACE: Returnerer 204")
+            call.respond(HttpStatusCode.NoContent)
             log.info("L-TRACE: Ferdig returnert")
             /*try {
                 log.info("L-TRACE: GET Prediksjon!")
