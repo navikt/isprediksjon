@@ -14,9 +14,9 @@ import org.slf4j.LoggerFactory
 
 class Tilgangskontroll(isDev: Boolean) {
 
-    val domain = if (isDev) "nais.preprod.local" else "nais.adeo.no"
+//    val domain = if (isDev) "nais.preprod.local" else "nais.adeo.no"
     private val url: String =
-        "https://syfo-tilgangskontroll.$domain/syfo-tilgangskontroll/api/tilgang/bruker"
+        "http://syfo-tilgangskontroll/syfo-tilgangskontroll/api/tilgang/bruker"
 
     data class Tilgang(val harTilgang: Boolean, val begrunnelse: String? = null)
 
