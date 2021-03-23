@@ -1,9 +1,13 @@
 package no.nav.syfo.application.api
 
 import io.ktor.application.*
+import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import no.nav.syfo.clients.Tilgangskontroll
+import no.nav.syfo.database
+import no.nav.syfo.domain.Fodselsnummer
+import no.nav.syfo.prediksjon.getPrediksjon
 import org.slf4j.LoggerFactory
 import java.time.OffsetDateTime
 
@@ -17,16 +21,7 @@ fun Route.registerPrediksjon(tilgangskontroll: Tilgangskontroll) {
 
     route(apiBasePath) {
         get(apiPrediksjon) {
-            val prediksjonTing = PrediksjonFrontend(
-                kortereVarighetGrunner = listOf("sykmelding", "lege", "diagnose"),
-                langt = true,
-                lengreVarighetGrunner = listOf("bosted", "favorittfarge", "nedbørsmengde"),
-                prediksjonsDato = OffsetDateTime.now()
-            )
-            log.info("L-TRACE: Returnerer fake prediksjon")
-            call.respond(prediksjonTing)
-            log.info("L-TRACE: Ferdig returnert")
-            /*try {
+            try {
                 log.info("L-TRACE: GET Prediksjon!")
                 val token = call.request.headers[HttpHeaders.Authorization]?.removePrefix("Bearer ")
                     ?: throw IllegalArgumentException("No Authorization header supplied")
@@ -50,14 +45,7 @@ fun Route.registerPrediksjon(tilgangskontroll: Tilgangskontroll) {
             } catch (e: Exception) {
                 log.info("L-TRACE: Fikk en exception! :O :( ", e)
                 throw e
-            }*/
+            }
         }
     }
 }
-
-data class PrediksjonFrontend(
-    val kortereVarighetGrunner: List<String>,
-    val langt: Boolean,
-    val lengreVarighetGrunner: List<String>,
-    val prediksjonsDato: OffsetDateTime
-)
