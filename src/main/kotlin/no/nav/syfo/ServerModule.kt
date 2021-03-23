@@ -5,6 +5,7 @@ import io.ktor.routing.*
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.api.registerNaisApi
 import no.nav.syfo.application.api.registerPrediksjon
+import no.nav.syfo.application.installContentNegotiation
 import no.nav.syfo.clients.Tilgangskontroll
 
 fun Application.serverModule(
@@ -12,6 +13,8 @@ fun Application.serverModule(
     env: Environment
 ) {
     log.info("Initialization of server module starting")
+
+    installContentNegotiation()
 
     routing {
         registerNaisApi(applicationState)
