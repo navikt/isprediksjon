@@ -27,7 +27,9 @@ data class Environment(
 
     val isProcessOppfolgingstilfelleOn: Boolean = getEnvVar("IS_PROCESS_OPPFOLGINGSTILFELLE_ON", "false").toBoolean(),
 
-    val developmentMode: Boolean = getEnvVar("DEVELOPMENT_MODE", "false").toBoolean()
+    val developmentMode: Boolean = getEnvVar("DEVELOPMENT_MODE", "false").toBoolean(),
+
+    val tilgangskontrollUrl: String = getEnvVar("TILGANGSKONTROLL_URL", "https://syfo-tilgangskontroll.nais.adeo.no")
 )
 
 data class VaultSecrets(

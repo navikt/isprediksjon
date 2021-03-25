@@ -12,11 +12,9 @@ import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.util.bearerHeader
 import org.slf4j.LoggerFactory
 
-class Tilgangskontroll(isDev: Boolean) {
+class Tilgangskontroll(baseUrl: String) {
 
-    val domain = if (isDev) "nais.preprod.local" else "nais.adeo.no"
-    private val url: String =
-        "http://syfo-tilgangskontroll.$domain/syfo-tilgangskontroll/api/tilgang/bruker"
+    val url = "$baseUrl/syfo-tilgangskontroll/api/tilgang/bruker"
 
     data class Tilgang(val harTilgang: Boolean, val begrunnelse: String? = null)
 
@@ -30,8 +28,8 @@ class Tilgangskontroll(isDev: Boolean) {
 
     suspend fun harTilgangTilBruker(fnr: Fodselsnummer, token: String): Boolean {
         try {
-            val tilgang = httpClient.get<Tilgang>(url) {
-                url("$url?fnr=${fnr.value}")
+            val completeUrl = "$url?fnr=${fnr.value}"
+            val tilgang = httpClient.get<Tilgang>(completeUrl) {
                 header(HttpHeaders.Authorization, bearerHeader(token))
                 accept(ContentType.Application.Json)
             }
