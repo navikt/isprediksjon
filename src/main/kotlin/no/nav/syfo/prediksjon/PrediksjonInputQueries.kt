@@ -24,12 +24,12 @@ const val queryCreatePrediksjonInput =
 fun DatabaseInterface.createPrediksjonInput(
     personOppfolgingstilfelle: PersonOppfolgingstilfelle
 ): Pair<Int, UUID> {
-    val uuid = UUID.randomUUID().toString()
+    val uuid = UUID.randomUUID()
     val now = Timestamp.from(Instant.now())
 
     connection.use { connection ->
         val idList = connection.prepareStatement(queryCreatePrediksjonInput).use {
-            it.setString(1, uuid)
+            it.setString(1, uuid.toString())
             it.setString(2, personOppfolgingstilfelle.fnr.value)
             it.setString(3, personOppfolgingstilfelle.aktorId.value)
             it.setObject(4, personOppfolgingstilfelle.tilfelleStartDate)
@@ -43,6 +43,6 @@ fun DatabaseInterface.createPrediksjonInput(
         }
         connection.commit()
 
-        return Pair(idList.first(), UUID.fromString(uuid))
+        return Pair(idList.first(), uuid)
     }
 }
