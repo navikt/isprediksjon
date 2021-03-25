@@ -18,7 +18,7 @@ fun Application.serverModule(
 
     routing {
         registerNaisApi(applicationState)
-        registerPrediksjon(Tilgangskontroll(env.developmentMode))
+        registerPrediksjon(Tilgangskontroll(env.tilgangskontrollUrl))
     }
     log.info("Initialization of server module done")
 }
