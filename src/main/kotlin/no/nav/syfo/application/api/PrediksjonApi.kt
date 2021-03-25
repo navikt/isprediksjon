@@ -5,19 +5,22 @@ import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import no.nav.syfo.clients.Tilgangskontroll
-import no.nav.syfo.database
+import no.nav.syfo.database.DatabaseInterface
 import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.prediksjon.getPrediksjon
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-val log: Logger = LoggerFactory.getLogger("no.nav.syfo.application.api")
+private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.application.api")
 
 const val apiBasePath = "/api/v1"
 const val apiPrediksjon = "/prediksjon"
 const val NAV_PERSONIDENT_HEADER = "nav-personident"
 
-fun Route.registerPrediksjon(tilgangskontroll: Tilgangskontroll) {
+fun Route.registerPrediksjon(
+    database: DatabaseInterface,
+    tilgangskontroll: Tilgangskontroll
+) {
 
     route(apiBasePath) {
         get(apiPrediksjon) {

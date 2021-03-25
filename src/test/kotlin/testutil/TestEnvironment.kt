@@ -5,7 +5,11 @@ import no.nav.syfo.VaultSecrets
 import java.net.ServerSocket
 import java.util.*
 
-fun testEnvironment(port: Int, kafkaBootstrapServers: String) = Environment(
+fun testEnvironment(
+    port: Int,
+    kafkaBootstrapServers: String,
+    tilgangskontrollUrl: String = ""
+) = Environment(
     applicationName = "isprediksjon",
     applicationPort = port,
     kafkaBootstrapServers = kafkaBootstrapServers,
@@ -23,7 +27,9 @@ fun testEnvironment(port: Int, kafkaBootstrapServers: String) = Environment(
     stsRestUrl = "http://stsrest",
     loginserviceClientId = "1234",
     aadDiscoveryUrl = "",
-    syketilfelleUrl = "http://syfosyketilfelle:0001"
+    syketilfelleUrl = "http://syfosyketilfelle:0001",
+    developmentMode = true,
+    tilgangskontrollUrl = tilgangskontrollUrl
 )
 
 val vaultSecrets = VaultSecrets(

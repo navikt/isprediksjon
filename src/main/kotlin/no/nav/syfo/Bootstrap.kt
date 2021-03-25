@@ -55,11 +55,15 @@ fun main() {
 
             module {
                 auth(wellKnown, listOf(env.loginserviceClientId))
-                serverModule(applicationState, env)
                 databaseModule(
                     applicationState,
                     env,
                     vaultCredentialService
+                )
+                serverModule(
+                    applicationState,
+                    database,
+                    env
                 )
                 kafkaModule(
                     applicationState,

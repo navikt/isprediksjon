@@ -5,16 +5,15 @@ import io.ktor.server.testing.*
 import io.mockk.unmockkAll
 import no.nav.syfo.database.DatabaseInterface
 import no.nav.syfo.database.toList
-import no.nav.syfo.domain.AktorId
-import no.nav.syfo.domain.Fodselsnummer
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import testutil.TestDB
+import testutil.UserConstants.ARBEIDSTAKER_FNR
+import testutil.generator.generatePrediksjonOutput
 import java.sql.SQLException
 import java.sql.Timestamp
 import java.time.Instant
-import java.time.OffsetDateTime
 import java.util.*
 
 object PrediksjonOutputSpek : Spek({
@@ -32,24 +31,12 @@ object PrediksjonOutputSpek : Spek({
         }
 
         describe("Should store and get from prediksjon_output") {
-            val fnr = Fodselsnummer("11111111111")
-            val aktorid = AktorId("2222222222222")
-
             database.createPrediksjonOutputTest(
-                PrediksjonOutput(
-                    fnr,
-                    aktorid,
-                    OffsetDateTime.now(),
-                    OffsetDateTime.now(),
-                    OffsetDateTime.now(),
-                    "OK",
-                    0.95f,
-                    ForklaringFrontend(listOf("diagnosis", "md"), listOf("grad", "time", "hist"))
-                ),
+                generatePrediksjonOutput,
                 1
             )
             it("Should return 1 prediksjon ") {
-                val prediksjonList = database.getPrediksjon(fnr)
+                val prediksjonList = database.getPrediksjon(ARBEIDSTAKER_FNR)
 
                 prediksjonList.size shouldBeEqualTo 1
             }
