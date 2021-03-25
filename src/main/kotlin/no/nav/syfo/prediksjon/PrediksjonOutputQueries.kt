@@ -27,7 +27,7 @@ fun ResultSet.toPrediksjon(): PrediksjonOutput {
 }
 
 fun DatabaseInterface.getPrediksjon(fnr: Fodselsnummer): List<PrediksjonOutput> {
-    return connection.use {
+    return connection.use { connection ->
         connection.prepareStatement(queryHentPrediksjon).use {
             it.setString(1, fnr.value)
             it.executeQuery().toList {
