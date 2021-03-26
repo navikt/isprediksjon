@@ -121,7 +121,7 @@ suspend fun createListener(applicationState: ApplicationState, action: suspend C
     }
 
 @KtorExperimentalAPI
-suspend fun blockingApplicationLogicSmRegTopic(
+fun blockingApplicationLogicSmRegTopic(
     applicationState: ApplicationState,
     database: DatabaseInterface,
     env: Environment,
@@ -132,7 +132,8 @@ suspend fun blockingApplicationLogicSmRegTopic(
     }
 }
 
-suspend fun pollAndProcessSMRegTopic(
+@KtorExperimentalAPI
+fun pollAndProcessSMRegTopic(
     kafkaConsumer: KafkaConsumer<String, String>,
     database: DatabaseInterface,
     env: Environment
@@ -146,9 +147,9 @@ suspend fun pollAndProcessSMRegTopic(
                 handleReceivedMessage(it, env, consumerRecord)
             }
             it.commit()
-            kafkaConsumer.commitSync()
-            log.info("Consumed $numberOfRecords records in " + (System.currentTimeMillis() - starttime) + " ms")
         }
+        kafkaConsumer.commitSync()
+        log.info("Consumed $numberOfRecords records in " + (System.currentTimeMillis() - starttime) + " ms")
     }
 }
 

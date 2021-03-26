@@ -7,7 +7,7 @@ import java.sql.Timestamp
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
-fun getQuery(tablename: String): String {
+fun getSMRegQuery(tablename: String): String {
     return """
     INSERT INTO $tablename(
         uniqueId,
@@ -20,7 +20,7 @@ fun getQuery(tablename: String): String {
     """
 }
 
-fun getTableNameFromTopic(env: Environment, topic: String): String {
+fun getSMRegTableNameFromTopic(env: Environment, topic: String): String {
     return when (topic) {
         env.sm2013ManuellBehandlingTopic -> "smManuellBehandling"
         env.sm2013AutomatiskBehandlingTopic -> "smAutomatiskBehandling"
@@ -34,7 +34,7 @@ fun getTableNameFromTopic(env: Environment, topic: String): String {
 }
 
 fun Connection.createSmRegRow(env: Environment, topic: String, uniqueId: String, data: String, sykmeldingId: String) {
-    prepareStatement(getQuery(getTableNameFromTopic(env, topic))).use {
+    prepareStatement(getSMRegQuery(getSMRegTableNameFromTopic(env, topic))).use {
         it.setString(1, uniqueId)
         it.setString(2, sykmeldingId)
         it.setTimestamp(3, Timestamp.from(OffsetDateTime.now(ZoneOffset.UTC).toInstant()))
