@@ -183,27 +183,31 @@ suspend fun pollAndProcessOppfolgingstilfelleTopic(
         "{}"
     }
 
-    kafkaConsumer.poll(Duration.ofMillis(100)).forEach { consumerRecord ->
-        val oppfolgingstilfelleTimer = HISTOGRAM_OPPFOLGINGSTILFELLE_DURATION.startTimer()
+    val consumerRecords = kafkaConsumer.poll(Duration.ofMillis(100))
+    val numberOfConsumerRecords = consumerRecords.count()
+    if (numberOfConsumerRecords > 0) {
+        consumerRecords.forEach { consumerRecord ->
+            val oppfolgingstilfelleTimer = HISTOGRAM_OPPFOLGINGSTILFELLE_DURATION.startTimer()
 
-        val callId = kafkaCallIdOppfolgingstilfelle()
-        val oppfolgingstilfellePeker: KOppfolgingstilfellePeker = objectMapper.readValue(consumerRecord.value())
+            val callId = kafkaCallIdOppfolgingstilfelle()
+            val oppfolgingstilfellePeker: KOppfolgingstilfellePeker = objectMapper.readValue(consumerRecord.value())
 
-        logValues = arrayOf(
-            StructuredArguments.keyValue("id", consumerRecord.key()),
-            StructuredArguments.keyValue("timestamp", consumerRecord.timestamp())
-        )
-        log.info(
-            "Received KOppfolgingstilfellePeker, ready to process, $logKeys, {}",
-            *logValues,
-            callIdArgument(callId)
-        )
-        if (isProcessOppfolgingstilfelleOn) {
-            oppfolgingstilfelleService.receiveOppfolgingstilfelle(oppfolgingstilfellePeker, callId)
+            logValues = arrayOf(
+                StructuredArguments.keyValue("id", consumerRecord.key()),
+                StructuredArguments.keyValue("timestamp", consumerRecord.timestamp())
+            )
+            log.info(
+                "Received KOppfolgingstilfellePeker, ready to process, $logKeys, {}",
+                *logValues,
+                callIdArgument(callId)
+            )
+            if (isProcessOppfolgingstilfelleOn) {
+                oppfolgingstilfelleService.receiveOppfolgingstilfelle(oppfolgingstilfellePeker, callId)
+            }
+            oppfolgingstilfelleTimer.observeDuration()
         }
-        oppfolgingstilfelleTimer.observeDuration()
+        kafkaConsumer.commitSync()
     }
-    kafkaConsumer.commitSync()
 }
 
 private val objectMapper: ObjectMapper = ObjectMapper().apply {
