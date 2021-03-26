@@ -17,14 +17,13 @@ import no.nav.syfo.util.bearerHeader
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import testutil.TestDB
+import testutil.*
 import testutil.UserConstants.ARBEIDSTAKER_FNR
 import testutil.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
-import testutil.dropData
+import testutil.UserConstants.VEILEDER_IDENT
 import testutil.generator.generatePrediksjonOutput
-import testutil.getRandomPort
 import testutil.mock.VeilederTilgangskontrollMock
-import testutil.testEnvironment
+import testutil.mock.wellKnownMock
 
 class PrediksjonApiSpek : Spek({
     val objectMapper: ObjectMapper = ObjectMapper().apply {
@@ -54,10 +53,13 @@ class PrediksjonApiSpek : Spek({
                 tilgangskontrollUrl = tilgangskontrollMock.url
             )
 
+            val wellKnown = wellKnownMock()
+
             application.serverModule(
                 applicationState = applicationState,
                 database = database,
                 env = environment,
+                wellKnown = wellKnown
             )
 
             beforeGroup {
@@ -75,6 +77,12 @@ class PrediksjonApiSpek : Spek({
             }
 
             val url = "$apiBasePath$apiPrediksjon"
+            val validToken = generateJWT(
+                environment.loginserviceClientId,
+                wellKnown.issuer,
+                VEILEDER_IDENT,
+            )
+
             describe("Successful get") {
                 it("should return DialogmoteList if request is successful") {
                     database.createPrediksjonOutputTest(
@@ -84,7 +92,7 @@ class PrediksjonApiSpek : Spek({
 
                     with(
                         handleRequest(HttpMethod.Get, url) {
-                            addHeader(Authorization, bearerHeader("validToken"))
+                            addHeader(Authorization, bearerHeader(validToken))
                             addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
                         }
                     ) {
@@ -102,7 +110,7 @@ class PrediksjonApiSpek : Spek({
                 it("should return empty list if request is successful, but no prediksjoner exists on given person") {
                     with(
                         handleRequest(HttpMethod.Get, url) {
-                            addHeader(Authorization, bearerHeader("validToken"))
+                            addHeader(Authorization, bearerHeader(validToken))
                             addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
                         }
                     ) {
@@ -116,20 +124,20 @@ class PrediksjonApiSpek : Spek({
             }
 
             describe("Failing get") {
-                it("Should return BadRequest if no token is given as header") {
+                it("Should return 401 Unauthorized if no token is given as header") {
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
                         }
                     ) {
-                        response.status() shouldBeEqualTo HttpStatusCode.BadRequest
+                        response.status() shouldBeEqualTo HttpStatusCode.Unauthorized
                     }
                 }
 
                 it("Should return BadRequest if no fnr is given as header") {
                     with(
                         handleRequest(HttpMethod.Get, url) {
-                            addHeader(Authorization, bearerHeader("validToken"))
+                            addHeader(Authorization, bearerHeader(validToken))
                         }
                     ) {
                         response.status() shouldBeEqualTo HttpStatusCode.BadRequest
@@ -139,7 +147,7 @@ class PrediksjonApiSpek : Spek({
                 it("Should return 403 Forbidden if veileder doesn't have access to user") {
                     with(
                         handleRequest(HttpMethod.Get, url) {
-                            addHeader(Authorization, bearerHeader("validToken"))
+                            addHeader(Authorization, bearerHeader(validToken))
                             addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_VEILEDER_NO_ACCESS.value)
                         }
                     ) {
