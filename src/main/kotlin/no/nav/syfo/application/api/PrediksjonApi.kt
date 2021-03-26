@@ -7,6 +7,9 @@ import io.ktor.routing.*
 import no.nav.syfo.clients.Tilgangskontroll
 import no.nav.syfo.database.DatabaseInterface
 import no.nav.syfo.domain.Fodselsnummer
+import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_FAILED
+import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_FORBIDDEN
+import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_SUCCESS
 import no.nav.syfo.prediksjon.getPrediksjon
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -35,13 +38,16 @@ fun Route.registerPrediksjon(
 
                 if (tilgang) {
                     val pred = database.getPrediksjon(Fodselsnummer(requestFnr))
+                    COUNT_PREDIKSJON_OUTPUT_SUCCESS.inc()
                     call.respond(pred)
                 } else {
+                    COUNT_PREDIKSJON_OUTPUT_FORBIDDEN.inc()
                     call.respond(HttpStatusCode.Forbidden)
                 }
             } catch (e: IllegalArgumentException) {
                 val illegalArgumentMessage = "Could not retrieve PrediksjonList for PersonIdent"
                 log.warn("$illegalArgumentMessage: {}", e.message)
+                COUNT_PREDIKSJON_OUTPUT_FAILED.inc()
                 call.respond(HttpStatusCode.BadRequest, e.message ?: illegalArgumentMessage)
             }
         }

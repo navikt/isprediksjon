@@ -9,6 +9,9 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.domain.Fodselsnummer
+import no.nav.syfo.metric.COUNT_TILGANGSKONTROLL_FAIL
+import no.nav.syfo.metric.COUNT_TILGANGSKONTROLL_FORBIDDEN
+import no.nav.syfo.metric.COUNT_TILGANGSKONTROLL_OK
 import no.nav.syfo.util.bearerHeader
 import org.slf4j.LoggerFactory
 
@@ -33,10 +36,12 @@ class Tilgangskontroll(baseUrl: String) {
                 header(HttpHeaders.Authorization, bearerHeader(token))
                 accept(ContentType.Application.Json)
             }
+            COUNT_TILGANGSKONTROLL_OK.inc()
 
             return tilgang.harTilgang
         } catch (e: ClientRequestException) {
             return if (e.response.status == HttpStatusCode.Forbidden) {
+                COUNT_TILGANGSKONTROLL_FORBIDDEN.inc()
                 false
             } else {
                 return handleUnexpectedReponseException(e.response)
@@ -52,6 +57,7 @@ class Tilgangskontroll(baseUrl: String) {
             "Error while requesting access to person from syfo-tilgangskontroll with {}",
             StructuredArguments.keyValue("statusCode", statusCode)
         )
+        COUNT_TILGANGSKONTROLL_FAIL.labels(statusCode).inc()
         return false
     }
 }

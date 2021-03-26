@@ -5,13 +5,18 @@ import io.prometheus.client.Histogram
 
 const val METRICS_NS = "isprediksjon"
 
-const val CALL_SYKETILFELLE_OPPFOLGINGSTILFELLE_AKTOR_EMPTY = "call_syketilfelle_oppfolgingstilfelle_aktorid_empty_count"
+const val TILGANGSKONTROLL_OK = "tilgangskontroll_ok"
+const val TILGANGSKONTROLL_FAIL = "tilgangskontroll_fail"
+
+const val CALL_SYKETILFELLE_OPPFOLGINGSTILFELLE_AKTOR_EMPTY =
+    "call_syketilfelle_oppfolgingstilfelle_aktorid_empty_count"
 val COUNT_CALL_SYKETILFELLE_OPPFOLGINGSTILFELLE_AKTOR_EMPTY: Counter = Counter.build()
     .namespace(METRICS_NS)
     .name(CALL_SYKETILFELLE_OPPFOLGINGSTILFELLE_AKTOR_EMPTY)
     .help("Counts the number of responses from syfosyketilfelle with status 204 received")
     .register()
-const val CALL_SYKETILFELLE_OPPFOLGINGSTILFELLE_AKTOR_SUCCESS = "call_syketilfelle_oppfolgingstilfelle_aktorid_success_count"
+const val CALL_SYKETILFELLE_OPPFOLGINGSTILFELLE_AKTOR_SUCCESS =
+    "call_syketilfelle_oppfolgingstilfelle_aktorid_success_count"
 val COUNT_CALL_SYKETILFELLE_OPPFOLGINGSTILFELLE_AKTOR_SUCCESS: Counter = Counter.build()
     .namespace(METRICS_NS)
     .name(CALL_SYKETILFELLE_OPPFOLGINGSTILFELLE_AKTOR_SUCCESS)
@@ -50,4 +55,45 @@ val HISTOGRAM_OPPFOLGINGSTILFELLE_DURATION: Histogram = Histogram.build()
     .namespace(METRICS_NS)
     .name(OPPFOLGINGSTILFELLE_DURATION)
     .help("Measure the current time it takes to handle an event oppfolgingstilfelle ")
+    .register()
+
+val COUNT_TILGANGSKONTROLL_OK: Counter = Counter.build()
+    .namespace(METRICS_NS)
+    .name(TILGANGSKONTROLL_OK)
+    .help("Counts the number of successful requests to tilgangskontroll")
+    .register()
+
+val COUNT_TILGANGSKONTROLL_FAIL: Counter = Counter.build()
+    .namespace(METRICS_NS)
+    .labelNames("status")
+    .name(TILGANGSKONTROLL_FAIL)
+    .help("Counts the number of failing requests to tilgangskontroll")
+    .register()
+
+const val TILGANGSKONTROLL_FORBIDDEN = "call_tilgangskontroll_person_forbidden_count"
+val COUNT_TILGANGSKONTROLL_FORBIDDEN: Counter = Counter.build()
+    .namespace(METRICS_NS)
+    .name(TILGANGSKONTROLL_FORBIDDEN)
+    .help("Counts the number of forbidden calls to syfo-tilgangskontroll - person")
+    .register()
+
+const val PREDIKSJON_GET_OUTPUT_SUCCESS = "prediksjon_output_success"
+val COUNT_PREDIKSJON_OUTPUT_SUCCESS: Counter = Counter.build()
+    .namespace(METRICS_NS)
+    .name(PREDIKSJON_GET_OUTPUT_SUCCESS)
+    .help("Counts the number of successful queries for prediksjon_output")
+    .register()
+
+const val PREDIKSJON_GET_OUTPUT_FAILED = "prediksjon_output_failed"
+val COUNT_PREDIKSJON_OUTPUT_FAILED: Counter = Counter.build()
+    .namespace(METRICS_NS)
+    .name(PREDIKSJON_GET_OUTPUT_FAILED)
+    .help("Counts the number of failed queries for prediksjon_output")
+    .register()
+
+const val PREDIKSJON_OUTPUT_FORBIDDEN = "prediksjon_output_forbidden"
+val COUNT_PREDIKSJON_OUTPUT_FORBIDDEN: Counter = Counter.build()
+    .namespace(METRICS_NS)
+    .name(PREDIKSJON_OUTPUT_FORBIDDEN)
+    .help("Counts the number of forbidden status retrieves")
     .register()
