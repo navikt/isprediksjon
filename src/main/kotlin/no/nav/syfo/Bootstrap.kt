@@ -8,7 +8,6 @@ import io.ktor.util.*
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.slf4j.MDCContext
 import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.auth.auth
 import no.nav.syfo.auth.getWellKnown
 import no.nav.syfo.database.VaultCredentialService
 import no.nav.syfo.util.getFileAsString
@@ -51,10 +50,8 @@ fun main() {
             }
 
             applicationState.alive = true
-            val wellKnown = getWellKnown(env.aadDiscoveryUrl)
 
             module {
-                auth(wellKnown, listOf(env.loginserviceClientId))
                 databaseModule(
                     applicationState,
                     env,
@@ -63,7 +60,8 @@ fun main() {
                 serverModule(
                     applicationState,
                     database,
-                    env
+                    env,
+                    getWellKnown(env.aadDiscoveryUrl)
                 )
                 kafkaModule(
                     applicationState,

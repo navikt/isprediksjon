@@ -18,6 +18,7 @@ object Versions {
     const val logbackVersion = "1.2.3"
     const val logstashEncoderVersion = "6.3"
     const val mockkVersion = "1.10.5"
+    const val nimbusjosejwtVersion = "7.5.1"
     const val postgresVersion = "42.2.18"
     const val postgresTestContainersVersion = "1.15.1"
     const val prometheusVersion = "0.9.0"
@@ -73,6 +74,7 @@ dependencies {
 
     implementation("io.arrow-kt:arrow-core-data:${Versions.arrowVersion}")
 
+    testImplementation("com.nimbusds:nimbus-jose-jwt:${Versions.nimbusjosejwtVersion}")
     testImplementation("org.amshove.kluent:kluent:${Versions.kluentVersion}")
     testImplementation("io.ktor:ktor-server-test-host:${Versions.ktorVersion}")
     testImplementation("io.mockk:mockk:${Versions.mockkVersion}")
