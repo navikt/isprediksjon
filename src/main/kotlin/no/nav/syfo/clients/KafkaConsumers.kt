@@ -15,7 +15,6 @@ fun kafkaConsumerSmregProperties(
     this[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
     this[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "1000"
     this[ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG] = "" + (10 * 1024 * 1024)
-    this[CommonClientConfigs.RETRIES_CONFIG] = "2"
     this[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = "false"
     this["security.protocol"] = "SASL_SSL"
     this["sasl.mechanism"] = "PLAIN"
@@ -34,9 +33,7 @@ fun kafkaConsumerOppfolgingstilfelleProperties(
 ) = Properties().apply {
     this[ConsumerConfig.GROUP_ID_CONFIG] = "${env.applicationName}-consumer-tilfelle-1"
     this[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "latest"
-    this[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = true
     this[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "10"
-    this[CommonClientConfigs.RETRIES_CONFIG] = "2"
     this[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = "false"
     this["security.protocol"] = "SASL_SSL"
     this["sasl.mechanism"] = "PLAIN"
