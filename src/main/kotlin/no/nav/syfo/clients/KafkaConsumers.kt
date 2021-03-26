@@ -13,9 +13,8 @@ fun kafkaConsumerSmregProperties(
 ) = Properties().apply {
     this[ConsumerConfig.GROUP_ID_CONFIG] = "${env.applicationName}-consumer4"
     this[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
-    this[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "10000"
+    this[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = "1000"
     this[ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG] = "" + (10 * 1024 * 1024)
-    this[ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG] = "" + (30 * 1000)
     this[CommonClientConfigs.RETRIES_CONFIG] = "2"
     this[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = "false"
     this["security.protocol"] = "SASL_SSL"
