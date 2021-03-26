@@ -18,7 +18,7 @@ data class DbConfig(
     val password: String,
     val username: String,
     val databaseName: String,
-    val poolSize: Int = 2,
+    val poolSize: Int = 4,
     val runMigrationsOninit: Boolean = true
 )
 

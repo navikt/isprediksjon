@@ -5,8 +5,11 @@ import io.ktor.util.*
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.unmockkAll
+import io.mockk.verify
+import kotlinx.coroutines.runBlocking
 import no.nav.common.KafkaEnvironment
 import no.nav.syfo.clients.kafkaConsumerSmregProperties
+import no.nav.syfo.pollAndProcessSMRegTopic
 import org.amshove.kluent.shouldBeEqualTo
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -95,15 +98,14 @@ object HandleReceivedMessageSpek : Spek({
                     val sykmeldingRecord = generateSykmeldingRecord(it.topic)
 
                     val mockConsumer = mockk<KafkaConsumer<String, String>>()
-                    every { mockConsumer.poll(Duration.ofMillis(0)) } returns ConsumerRecords(
+                    every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
                         mapOf(sykmeldingTopicPartition to listOf(sykmeldingRecord))
                     )
+                    every { mockConsumer.commitSync() } returns Unit
 
                     it("should store data from record") {
-                        mockConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
-                            handleReceivedMessage(database, env, consumerRecord)
-                        }
-
+                        runBlocking { pollAndProcessSMRegTopic(mockConsumer, database, env) }
+                        verify(exactly = 1) { mockConsumer.commitSync() }
                         val sykmeldingListe: List<String> = database.connection.getSM(table, sykmeldingRecord.key())
                         sykmeldingListe.size shouldBeEqualTo 1
                     }

@@ -83,7 +83,7 @@ suspend fun launchListeners(
         val oppfolgingstilfelleTopic = env.oppfolgingstilfelleTopic
         log.info("Subscribing to topic: $oppfolgingstilfelleTopic")
         kafkaConsumerOppfolgingstilfelle.subscribe(listOf(oppfolgingstilfelleTopic))
-        blockingApplicationLogic(
+        blockingApplicationLogicOppfolgingstilfelle(
             applicationState,
             kafkaConsumerOppfolgingstilfelle,
             oppfolgingstilfelleService,
@@ -96,7 +96,7 @@ suspend fun launchListeners(
 
         log.info("Subscribing to topics: ${env.kafkaConsumerTopics}")
         kafkaConsumerSmReg.subscribe(env.kafkaConsumerTopics)
-        blockingApplicationLogic(
+        blockingApplicationLogicSmRegTopic(
             applicationState,
             database,
             env,
@@ -121,22 +121,40 @@ suspend fun createListener(applicationState: ApplicationState, action: suspend C
     }
 
 @KtorExperimentalAPI
-suspend fun blockingApplicationLogic(
+fun blockingApplicationLogicSmRegTopic(
     applicationState: ApplicationState,
     database: DatabaseInterface,
     env: Environment,
     kafkaConsumer: KafkaConsumer<String, String>
 ) {
     while (applicationState.ready) {
-        kafkaConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
-            handleReceivedMessage(database, env, consumerRecord)
-        }
-        delay(100)
+        pollAndProcessSMRegTopic(kafkaConsumer, database, env)
     }
 }
 
 @KtorExperimentalAPI
-suspend fun blockingApplicationLogic(
+fun pollAndProcessSMRegTopic(
+    kafkaConsumer: KafkaConsumer<String, String>,
+    database: DatabaseInterface,
+    env: Environment
+) {
+    val starttime = System.currentTimeMillis()
+    val consumerRecords = kafkaConsumer.poll(Duration.ofMillis(1000))
+    val numberOfRecords = consumerRecords.count()
+    if (numberOfRecords > 0) {
+        database.connection.use {
+            consumerRecords.forEach { consumerRecord ->
+                handleReceivedMessage(it, env, consumerRecord)
+            }
+            it.commit()
+        }
+        kafkaConsumer.commitSync()
+        log.info("Consumed $numberOfRecords records in " + (System.currentTimeMillis() - starttime) + " ms")
+    }
+}
+
+@KtorExperimentalAPI
+suspend fun blockingApplicationLogicOppfolgingstilfelle(
     applicationState: ApplicationState,
     kafkaConsumer: KafkaConsumer<String, String>,
     oppfolgingstilfelleService: OppfolgingstilfelleService,
@@ -165,27 +183,31 @@ suspend fun pollAndProcessOppfolgingstilfelleTopic(
         "{}"
     }
 
-    kafkaConsumer.poll(Duration.ofMillis(0)).forEach { consumerRecord ->
-        val oppfolgingstilfelleTimer = HISTOGRAM_OPPFOLGINGSTILFELLE_DURATION.startTimer()
+    val consumerRecords = kafkaConsumer.poll(Duration.ofMillis(100))
+    val numberOfConsumerRecords = consumerRecords.count()
+    if (numberOfConsumerRecords > 0) {
+        consumerRecords.forEach { consumerRecord ->
+            val oppfolgingstilfelleTimer = HISTOGRAM_OPPFOLGINGSTILFELLE_DURATION.startTimer()
 
-        val callId = kafkaCallIdOppfolgingstilfelle()
-        val oppfolgingstilfellePeker: KOppfolgingstilfellePeker = objectMapper.readValue(consumerRecord.value())
+            val callId = kafkaCallIdOppfolgingstilfelle()
+            val oppfolgingstilfellePeker: KOppfolgingstilfellePeker = objectMapper.readValue(consumerRecord.value())
 
-        logValues = arrayOf(
-            StructuredArguments.keyValue("id", consumerRecord.key()),
-            StructuredArguments.keyValue("timestamp", consumerRecord.timestamp())
-        )
-        log.info(
-            "Received KOppfolgingstilfellePeker, ready to process, $logKeys, {}",
-            *logValues,
-            callIdArgument(callId)
-        )
-        if (isProcessOppfolgingstilfelleOn) {
-            oppfolgingstilfelleService.receiveOppfolgingstilfelle(oppfolgingstilfellePeker, callId)
+            logValues = arrayOf(
+                StructuredArguments.keyValue("id", consumerRecord.key()),
+                StructuredArguments.keyValue("timestamp", consumerRecord.timestamp())
+            )
+            log.info(
+                "Received KOppfolgingstilfellePeker, ready to process, $logKeys, {}",
+                *logValues,
+                callIdArgument(callId)
+            )
+            if (isProcessOppfolgingstilfelleOn) {
+                oppfolgingstilfelleService.receiveOppfolgingstilfelle(oppfolgingstilfellePeker, callId)
+            }
+            oppfolgingstilfelleTimer.observeDuration()
         }
-        oppfolgingstilfelleTimer.observeDuration()
+        kafkaConsumer.commitSync()
     }
-    delay(100)
 }
 
 private val objectMapper: ObjectMapper = ObjectMapper().apply {

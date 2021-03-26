@@ -9,6 +9,7 @@ import io.ktor.server.testing.*
 import io.ktor.util.*
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import no.nav.common.KafkaEnvironment
 import no.nav.syfo.clients.aktor.AktorService
@@ -128,9 +129,10 @@ object KafkaOppfolgingstilfelleSpek : Spek({
                 )
 
                 val mockConsumer = mockk<KafkaConsumer<String, String>>()
-                every { mockConsumer.poll(Duration.ofMillis(0)) } returns ConsumerRecords(
+                every { mockConsumer.poll(any<Duration>()) } returns ConsumerRecords(
                     mapOf(oppfolgingstilfelleTopicPartition to listOf(oppfolgingstilfellePekerRecord))
                 )
+                every { mockConsumer.commitSync() } returns Unit
 
                 runBlocking {
                     pollAndProcessOppfolgingstilfelleTopic(
@@ -139,6 +141,7 @@ object KafkaOppfolgingstilfelleSpek : Spek({
                         isProcessOppfolgingstilfelleOn = true
                     )
                 }
+                verify(exactly = 1) { mockConsumer.commitSync() }
 
                 val prediksjonInputFnrList =
                     database.connection.getPrediksjonInput(ARBEIDSTAKER_FNR)
