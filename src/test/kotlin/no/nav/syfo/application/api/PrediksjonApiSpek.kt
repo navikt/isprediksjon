@@ -10,8 +10,9 @@ import io.ktor.http.*
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.server.testing.*
 import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.prediksjon.PrediksjonOutput
+import no.nav.syfo.prediksjon.PrediksjonFrontend
 import no.nav.syfo.prediksjon.createPrediksjonOutputTest
+import no.nav.syfo.prediksjon.toPrediksjonFrontend
 import no.nav.syfo.serverModule
 import no.nav.syfo.util.bearerHeader
 import org.amshove.kluent.shouldBeEqualTo
@@ -21,7 +22,8 @@ import testutil.*
 import testutil.UserConstants.ARBEIDSTAKER_FNR
 import testutil.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
 import testutil.UserConstants.VEILEDER_IDENT
-import testutil.generator.generatePrediksjonOutput
+import testutil.generator.generateOldPrediksjonOutput
+import testutil.generator.generatePrediksjonOutputLong
 import testutil.mock.VeilederTilgangskontrollMock
 import testutil.mock.wellKnownMock
 
@@ -84,10 +86,17 @@ class PrediksjonApiSpek : Spek({
             )
 
             describe("Successful get") {
-                it("should return DialogmoteList if request is successful") {
+                it("should return the latest prediksjon if request is successful") {
+                    val oldPrediksjon = generateOldPrediksjonOutput
                     database.createPrediksjonOutputTest(
-                        generatePrediksjonOutput,
+                        oldPrediksjon,
                         1
+                    )
+
+                    val wantedPrediksjon = generatePrediksjonOutputLong
+                    database.createPrediksjonOutputTest(
+                        wantedPrediksjon,
+                        2
                     )
 
                     with(
@@ -98,27 +107,25 @@ class PrediksjonApiSpek : Spek({
                     ) {
                         response.status() shouldBeEqualTo HttpStatusCode.OK
 
-                        val prediksjonList = objectMapper.readValue<List<PrediksjonOutput>>(response.content!!)
+                        val actualPrediksjon = objectMapper.readValue<PrediksjonFrontend>(response.content!!)
 
-                        prediksjonList.size shouldBeEqualTo 1
+                        val wantedPrediksjonFrontend = wantedPrediksjon.toPrediksjonFrontend()
 
-                        val prediksjon = prediksjonList[0]
-                        prediksjon.fnr shouldBeEqualTo ARBEIDSTAKER_FNR
+                        actualPrediksjon.langt shouldBeEqualTo wantedPrediksjonFrontend.langt
+                        actualPrediksjon.kortereVarighetGrunner shouldBeEqualTo wantedPrediksjonFrontend.kortereVarighetGrunner
+                        actualPrediksjon.lengreVarighetGrunner shouldBeEqualTo wantedPrediksjonFrontend.lengreVarighetGrunner
+                        actualPrediksjon.prediksjonsDato.toLocalDate() shouldBeEqualTo wantedPrediksjonFrontend.prediksjonsDato.toLocalDate()
                     }
                 }
 
-                it("should return empty list if request is successful, but no prediksjoner exists on given person") {
+                it("should return 204 No Content if request is successful, but no prediksjoner exists on given person") {
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(Authorization, bearerHeader(validToken))
                             addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
                         }
                     ) {
-                        response.status() shouldBeEqualTo HttpStatusCode.OK
-
-                        val prediksjonList = objectMapper.readValue<List<PrediksjonOutput>>(response.content!!)
-
-                        prediksjonList.size shouldBeEqualTo 0
+                        response.status() shouldBeEqualTo HttpStatusCode.NoContent
                     }
                 }
             }
