@@ -122,7 +122,7 @@ class PrediksjonApiSpek : Spek({
                     }
                 }
 
-                it("should return 204 No Content list if request is successful, but no prediksjoner exists on given person") {
+                it("should return 204 No Content if request is successful, but no prediksjoner exists on given person") {
                     val counter = COUNT_PREDIKSJON_OUTPUT_SUCCESS.get()
                     with(
                         handleRequest(HttpMethod.Get, url) {
