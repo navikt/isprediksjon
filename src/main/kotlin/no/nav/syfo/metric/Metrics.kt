@@ -91,6 +91,13 @@ val COUNT_PREDIKSJON_OUTPUT_FAILED: Counter = Counter.build()
     .help("Counts the number of failed queries for prediksjon_output")
     .register()
 
+const val PREDIKSJON_GET_OUTPUT_ERROR = "prediksjon_output_error"
+val COUNT_PREDIKSJON_OUTPUT_ERROR: Counter = Counter.build()
+    .namespace(METRICS_NS)
+    .name(PREDIKSJON_GET_OUTPUT_ERROR)
+    .help("Counts the number of failed queries for prediksjon_output")
+    .register()
+
 const val PREDIKSJON_OUTPUT_FORBIDDEN = "prediksjon_output_forbidden"
 val COUNT_PREDIKSJON_OUTPUT_FORBIDDEN: Counter = Counter.build()
     .namespace(METRICS_NS)

@@ -10,6 +10,10 @@ import io.ktor.http.*
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.server.testing.*
 import no.nav.syfo.application.ApplicationState
+import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_ERROR
+import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_FAILED
+import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_FORBIDDEN
+import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_SUCCESS
 import no.nav.syfo.prediksjon.PrediksjonOutput
 import no.nav.syfo.prediksjon.createPrediksjonOutputTest
 import no.nav.syfo.serverModule
@@ -45,7 +49,7 @@ class PrediksjonApiSpek : Spek({
                 ready = true
             )
 
-            val database = TestDB()
+            var database = TestDB()
 
             val environment = testEnvironment(
                 getRandomPort(),
@@ -90,6 +94,7 @@ class PrediksjonApiSpek : Spek({
                         1
                     )
 
+                    val counter = COUNT_PREDIKSJON_OUTPUT_SUCCESS.get()
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(Authorization, bearerHeader(validToken))
@@ -97,6 +102,8 @@ class PrediksjonApiSpek : Spek({
                         }
                     ) {
                         response.status() shouldBeEqualTo HttpStatusCode.OK
+
+                        COUNT_PREDIKSJON_OUTPUT_SUCCESS.get() shouldBeEqualTo counter.inc()
 
                         val prediksjonList = objectMapper.readValue<List<PrediksjonOutput>>(response.content!!)
 
@@ -108,6 +115,7 @@ class PrediksjonApiSpek : Spek({
                 }
 
                 it("should return empty list if request is successful, but no prediksjoner exists on given person") {
+                    val counter = COUNT_PREDIKSJON_OUTPUT_SUCCESS.get()
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(Authorization, bearerHeader(validToken))
@@ -116,6 +124,7 @@ class PrediksjonApiSpek : Spek({
                     ) {
                         response.status() shouldBeEqualTo HttpStatusCode.OK
 
+                        COUNT_PREDIKSJON_OUTPUT_SUCCESS.get() shouldBeEqualTo counter.inc()
                         val prediksjonList = objectMapper.readValue<List<PrediksjonOutput>>(response.content!!)
 
                         prediksjonList.size shouldBeEqualTo 0
@@ -135,16 +144,19 @@ class PrediksjonApiSpek : Spek({
                 }
 
                 it("Should return BadRequest if no fnr is given as header") {
+                    val counter = COUNT_PREDIKSJON_OUTPUT_FAILED.get()
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(Authorization, bearerHeader(validToken))
                         }
                     ) {
                         response.status() shouldBeEqualTo HttpStatusCode.BadRequest
+                        COUNT_PREDIKSJON_OUTPUT_FAILED.get() shouldBeEqualTo counter.inc()
                     }
                 }
 
                 it("Should return 403 Forbidden if veileder doesn't have access to user") {
+                    val counter = COUNT_PREDIKSJON_OUTPUT_FORBIDDEN.get()
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(Authorization, bearerHeader(validToken))
@@ -152,6 +164,30 @@ class PrediksjonApiSpek : Spek({
                         }
                     ) {
                         response.status() shouldBeEqualTo HttpStatusCode.Forbidden
+                        COUNT_PREDIKSJON_OUTPUT_FORBIDDEN.get() shouldBeEqualTo counter.inc()
+                    }
+                }
+            }
+            describe("Database down") {
+                it("should return error when database fails") {
+                    database.stop()
+                    try {
+                        val counterSuccess = COUNT_PREDIKSJON_OUTPUT_SUCCESS.get()
+                        val counterError = COUNT_PREDIKSJON_OUTPUT_ERROR.get()
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(Authorization, bearerHeader(validToken))
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.InternalServerError
+
+                            COUNT_PREDIKSJON_OUTPUT_SUCCESS.get() shouldBeEqualTo counterSuccess
+                            COUNT_PREDIKSJON_OUTPUT_ERROR.get() shouldBeEqualTo counterError.inc()
+                        }
+                    } finally {
+                        // Recreate database
+                        database = TestDB()
                     }
                 }
             }
