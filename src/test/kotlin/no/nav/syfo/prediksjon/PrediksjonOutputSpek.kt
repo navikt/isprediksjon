@@ -10,7 +10,7 @@ import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import testutil.TestDB
 import testutil.UserConstants.ARBEIDSTAKER_FNR
-import testutil.generator.generatePrediksjonOutput
+import testutil.generator.generateGenericPrediksjonOutput
 import java.sql.SQLException
 import java.sql.Timestamp
 import java.time.Instant
@@ -32,7 +32,7 @@ object PrediksjonOutputSpek : Spek({
 
         describe("Should store and get from prediksjon_output") {
             database.createPrediksjonOutputTest(
-                generatePrediksjonOutput,
+                generateGenericPrediksjonOutput,
                 1
             )
             it("Should return 1 prediksjon ") {

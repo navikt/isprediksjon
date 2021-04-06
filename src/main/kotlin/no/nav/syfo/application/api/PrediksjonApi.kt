@@ -11,6 +11,8 @@ import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_FAILED
 import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_FORBIDDEN
 import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_SUCCESS
 import no.nav.syfo.prediksjon.getPrediksjon
+import no.nav.syfo.prediksjon.toPrediksjonFrontend
+import no.nav.syfo.util.latestPrediksjon
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -38,8 +40,16 @@ fun Route.registerPrediksjon(
 
                 if (tilgang) {
                     val pred = database.getPrediksjon(Fodselsnummer(requestFnr))
+
+                    if (pred.isEmpty()) {
+                        call.respond(HttpStatusCode.NoContent)
+                    } else {
+                        val latestPrediksjon = pred.latestPrediksjon()
+                        val frontendPrediksjon = latestPrediksjon.toPrediksjonFrontend()
+
+                        call.respond(frontendPrediksjon)
+                    }
                     COUNT_PREDIKSJON_OUTPUT_SUCCESS.inc()
-                    call.respond(pred)
                 } else {
                     COUNT_PREDIKSJON_OUTPUT_FORBIDDEN.inc()
                     call.respond(HttpStatusCode.Forbidden)
