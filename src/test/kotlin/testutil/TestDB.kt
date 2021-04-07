@@ -21,9 +21,12 @@ class TestDB : DatabaseInterface {
         withPassword("password")
     }
 
+    private var paused = false
+
     private var db: DatabaseInterface
+
     override val connection: Connection
-        get() = db.connection.apply { autoCommit = false }
+        get() = if (paused) throw Exception("DB is paused") else db.connection.apply { autoCommit = false }
 
     init {
         container.start()
@@ -35,6 +38,14 @@ class TestDB : DatabaseInterface {
                 databaseName = "db_test"
             )
         )
+    }
+
+    fun pause() {
+        paused = true
+    }
+
+    fun resume() {
+        paused = false
     }
 
     fun stop() {

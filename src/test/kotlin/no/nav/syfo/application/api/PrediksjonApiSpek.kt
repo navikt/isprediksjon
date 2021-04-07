@@ -51,7 +51,7 @@ class PrediksjonApiSpek : Spek({
                 ready = true
             )
 
-            var database = TestDB()
+            val database = TestDB()
 
             val environment = testEnvironment(
                 getRandomPort(),
@@ -175,7 +175,7 @@ class PrediksjonApiSpek : Spek({
             }
             describe("Database down") {
                 it("should return error when database fails") {
-                    database.stop()
+                    database.pause()
                     try {
                         val counterSuccess = COUNT_PREDIKSJON_OUTPUT_SUCCESS.get()
                         val counterError = COUNT_PREDIKSJON_OUTPUT_ERROR.get()
@@ -191,8 +191,7 @@ class PrediksjonApiSpek : Spek({
                             COUNT_PREDIKSJON_OUTPUT_ERROR.get() shouldBeEqualTo counterError.inc()
                         }
                     } finally {
-                        // Recreate database
-                        database = TestDB()
+                        database.resume()
                     }
                 }
             }
