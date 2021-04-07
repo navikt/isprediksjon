@@ -10,6 +10,10 @@ import io.ktor.http.*
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.server.testing.*
 import no.nav.syfo.application.ApplicationState
+import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_ERROR
+import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_FAILED
+import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_FORBIDDEN
+import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_SUCCESS
 import no.nav.syfo.prediksjon.PrediksjonFrontend
 import no.nav.syfo.prediksjon.createPrediksjonOutputTest
 import no.nav.syfo.prediksjon.toPrediksjonFrontend
@@ -92,13 +96,12 @@ class PrediksjonApiSpek : Spek({
                         oldPrediksjon,
                         1
                     )
-
                     val wantedPrediksjon = generatePrediksjonOutputLong
                     database.createPrediksjonOutputTest(
                         wantedPrediksjon,
                         2
                     )
-
+                    val counter = COUNT_PREDIKSJON_OUTPUT_SUCCESS.get()
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(Authorization, bearerHeader(validToken))
@@ -107,8 +110,9 @@ class PrediksjonApiSpek : Spek({
                     ) {
                         response.status() shouldBeEqualTo HttpStatusCode.OK
 
-                        val actualPrediksjon = objectMapper.readValue<PrediksjonFrontend>(response.content!!)
+                        COUNT_PREDIKSJON_OUTPUT_SUCCESS.get() shouldBeEqualTo counter.inc()
 
+                        val actualPrediksjon = objectMapper.readValue<PrediksjonFrontend>(response.content!!)
                         val wantedPrediksjonFrontend = wantedPrediksjon.toPrediksjonFrontend()
 
                         actualPrediksjon.langt shouldBeEqualTo wantedPrediksjonFrontend.langt
@@ -119,6 +123,7 @@ class PrediksjonApiSpek : Spek({
                 }
 
                 it("should return 204 No Content if request is successful, but no prediksjoner exists on given person") {
+                    val counter = COUNT_PREDIKSJON_OUTPUT_SUCCESS.get()
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(Authorization, bearerHeader(validToken))
@@ -126,6 +131,8 @@ class PrediksjonApiSpek : Spek({
                         }
                     ) {
                         response.status() shouldBeEqualTo HttpStatusCode.NoContent
+
+                        COUNT_PREDIKSJON_OUTPUT_SUCCESS.get() shouldBeEqualTo counter.inc()
                     }
                 }
             }
@@ -142,16 +149,19 @@ class PrediksjonApiSpek : Spek({
                 }
 
                 it("Should return BadRequest if no fnr is given as header") {
+                    val counter = COUNT_PREDIKSJON_OUTPUT_FAILED.get()
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(Authorization, bearerHeader(validToken))
                         }
                     ) {
                         response.status() shouldBeEqualTo HttpStatusCode.BadRequest
+                        COUNT_PREDIKSJON_OUTPUT_FAILED.get() shouldBeEqualTo counter.inc()
                     }
                 }
 
                 it("Should return 403 Forbidden if veileder doesn't have access to user") {
+                    val counter = COUNT_PREDIKSJON_OUTPUT_FORBIDDEN.get()
                     with(
                         handleRequest(HttpMethod.Get, url) {
                             addHeader(Authorization, bearerHeader(validToken))
@@ -159,6 +169,29 @@ class PrediksjonApiSpek : Spek({
                         }
                     ) {
                         response.status() shouldBeEqualTo HttpStatusCode.Forbidden
+                        COUNT_PREDIKSJON_OUTPUT_FORBIDDEN.get() shouldBeEqualTo counter.inc()
+                    }
+                }
+            }
+            describe("Database down") {
+                it("should return error when database fails") {
+                    database.pause()
+                    try {
+                        val counterSuccess = COUNT_PREDIKSJON_OUTPUT_SUCCESS.get()
+                        val counterError = COUNT_PREDIKSJON_OUTPUT_ERROR.get()
+                        with(
+                            handleRequest(HttpMethod.Get, url) {
+                                addHeader(Authorization, bearerHeader(validToken))
+                                addHeader(NAV_PERSONIDENT_HEADER, ARBEIDSTAKER_FNR.value)
+                            }
+                        ) {
+                            response.status() shouldBeEqualTo HttpStatusCode.InternalServerError
+
+                            COUNT_PREDIKSJON_OUTPUT_SUCCESS.get() shouldBeEqualTo counterSuccess
+                            COUNT_PREDIKSJON_OUTPUT_ERROR.get() shouldBeEqualTo counterError.inc()
+                        }
+                    } finally {
+                        database.resume()
                     }
                 }
             }

@@ -7,6 +7,7 @@ import io.ktor.routing.*
 import no.nav.syfo.clients.Tilgangskontroll
 import no.nav.syfo.database.DatabaseInterface
 import no.nav.syfo.domain.Fodselsnummer
+import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_ERROR
 import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_FAILED
 import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_FORBIDDEN
 import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_SUCCESS
@@ -59,6 +60,11 @@ fun Route.registerPrediksjon(
                 log.warn("$illegalArgumentMessage: {}", e.message)
                 COUNT_PREDIKSJON_OUTPUT_FAILED.inc()
                 call.respond(HttpStatusCode.BadRequest, e.message ?: illegalArgumentMessage)
+            } catch (e: Exception) {
+                val errorMessage = "An unexpected exception occurred"
+                log.error(errorMessage, e)
+                COUNT_PREDIKSJON_OUTPUT_ERROR.inc()
+                call.respond(HttpStatusCode.InternalServerError, errorMessage)
             }
         }
     }
