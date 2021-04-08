@@ -29,7 +29,9 @@ data class Environment(
 
     val developmentMode: Boolean = getEnvVar("DEVELOPMENT_MODE", "false").toBoolean(),
 
-    val tilgangskontrollUrl: String = getEnvVar("TILGANGSKONTROLL_URL", "https://syfo-tilgangskontroll.nais.adeo.no")
+    val tilgangskontrollUrl: String = getEnvVar("TILGANGSKONTROLL_URL", "https://syfo-tilgangskontroll.nais.adeo.no"),
+
+    val tilgangPath: String = getEnvVar("TILGANG_PATH", "/var/run/secrets/nais.io/vault/tilgang.json")
 )
 
 data class VaultSecrets(

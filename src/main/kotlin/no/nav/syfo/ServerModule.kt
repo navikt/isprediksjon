@@ -11,6 +11,7 @@ import no.nav.syfo.auth.WellKnown
 import no.nav.syfo.auth.auth
 import no.nav.syfo.clients.Tilgangskontroll
 import no.nav.syfo.database.DatabaseInterface
+import no.nav.syfo.auth.MidlertidigTilgangsSjekk
 
 fun Application.serverModule(
     applicationState: ApplicationState,
@@ -28,7 +29,8 @@ fun Application.serverModule(
         authenticate {
             registerPrediksjon(
                 database,
-                Tilgangskontroll(env.tilgangskontrollUrl)
+                Tilgangskontroll(env.tilgangskontrollUrl),
+                MidlertidigTilgangsSjekk(env.tilgangPath)
             )
         }
     }

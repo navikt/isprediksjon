@@ -29,7 +29,8 @@ fun testEnvironment(
     aadDiscoveryUrl = "",
     syketilfelleUrl = "http://syfosyketilfelle:0001",
     developmentMode = true,
-    tilgangskontrollUrl = tilgangskontrollUrl
+    tilgangskontrollUrl = tilgangskontrollUrl,
+    tilgangPath = "./src/test/resources/tilgang.json"
 )
 
 val vaultSecrets = VaultSecrets(
