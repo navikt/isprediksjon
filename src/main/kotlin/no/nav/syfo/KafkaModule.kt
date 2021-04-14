@@ -17,12 +17,12 @@ import no.nav.syfo.clients.aktor.AktorregisterClient
 import no.nav.syfo.clients.sts.StsRestClient
 import no.nav.syfo.clients.syketilfelle.SyketilfelleClient
 import no.nav.syfo.database.DatabaseInterface
+import no.nav.syfo.metric.COUNT_ANTALL_SYKMELDINGER_MOTTATT
 import no.nav.syfo.metric.HISTOGRAM_OPPFOLGINGSTILFELLE_DURATION
 import no.nav.syfo.oppfolgingstilfelle.OppfolgingstilfelleService
 import no.nav.syfo.oppfolgingstilfelle.domain.KOppfolgingstilfellePeker
 import no.nav.syfo.persistence.handleReceivedMessage
 import no.nav.syfo.prediksjon.PrediksjonInputService
-import no.nav.syfo.util.callIdArgument
 import no.nav.syfo.util.kafkaCallIdOppfolgingstilfelle
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import java.time.Duration
@@ -138,7 +138,6 @@ fun pollAndProcessSMRegTopic(
     database: DatabaseInterface,
     env: Environment
 ) {
-    val starttime = System.currentTimeMillis()
     val consumerRecords = kafkaConsumer.poll(Duration.ofMillis(1000))
     val numberOfRecords = consumerRecords.count()
     if (numberOfRecords > 0) {
@@ -149,7 +148,7 @@ fun pollAndProcessSMRegTopic(
             it.commit()
         }
         kafkaConsumer.commitSync()
-        log.info("Consumed $numberOfRecords records in " + (System.currentTimeMillis() - starttime) + " ms")
+        COUNT_ANTALL_SYKMELDINGER_MOTTATT.inc(numberOfRecords.toDouble())
     }
 }
 
@@ -174,14 +173,6 @@ suspend fun pollAndProcessOppfolgingstilfelleTopic(
     oppfolgingstilfelleService: OppfolgingstilfelleService,
     isProcessOppfolgingstilfelleOn: Boolean
 ) {
-    var logValues = arrayOf(
-        StructuredArguments.keyValue("id", "missing"),
-        StructuredArguments.keyValue("timestamp", "missing")
-    )
-
-    val logKeys = logValues.joinToString(prefix = "(", postfix = ")", separator = ",") {
-        "{}"
-    }
 
     val consumerRecords = kafkaConsumer.poll(Duration.ofMillis(100))
     val numberOfConsumerRecords = consumerRecords.count()
@@ -192,15 +183,6 @@ suspend fun pollAndProcessOppfolgingstilfelleTopic(
             val callId = kafkaCallIdOppfolgingstilfelle()
             val oppfolgingstilfellePeker: KOppfolgingstilfellePeker = objectMapper.readValue(consumerRecord.value())
 
-            logValues = arrayOf(
-                StructuredArguments.keyValue("id", consumerRecord.key()),
-                StructuredArguments.keyValue("timestamp", consumerRecord.timestamp())
-            )
-            log.info(
-                "Received KOppfolgingstilfellePeker, ready to process, $logKeys, {}",
-                *logValues,
-                callIdArgument(callId)
-            )
             if (isProcessOppfolgingstilfelleOn) {
                 oppfolgingstilfelleService.receiveOppfolgingstilfelle(oppfolgingstilfellePeker, callId)
             }
