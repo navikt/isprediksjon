@@ -50,6 +50,13 @@ val COUNT_PREDIKSJON_INPUT_CREATED: Counter = Counter.build()
     .help("Counts the number of PrediksjonInput stored in database")
     .register()
 
+const val ANTALL_SYKMELDINGER_MOTTATT = "sykmelding_mottatt_count"
+val COUNT_ANTALL_SYKMELDINGER_MOTTATT: Counter = Counter.build()
+    .namespace(METRICS_NS)
+    .name(ANTALL_SYKMELDINGER_MOTTATT)
+    .help("Counts the number of sykmeldinger read from Kafka")
+    .register()
+
 const val OPPFOLGINGSTILFELLE_DURATION = "oppfolgingstilfelle_duration_histogram"
 val HISTOGRAM_OPPFOLGINGSTILFELLE_DURATION: Histogram = Histogram.build()
     .namespace(METRICS_NS)
