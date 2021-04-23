@@ -39,6 +39,7 @@ spec:
       - kvPath: serviceuser/data/dev/srvisprediksjon
         mountPath: /secrets/serviceuser
   ingresses:
+    - "https://isprediksjon.dev.intern.nav.no"
     - "https://isprediksjon.nais.preprod.local"
   webproxy: true
   env:
