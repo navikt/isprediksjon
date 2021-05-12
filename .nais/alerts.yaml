@@ -12,7 +12,7 @@ spec:
       prependText: '<!here> | '
   alerts:
     - alert: ISPREDIKSJON IS DOWN
-      expr: up{app="isprediksjon", job="kubernetes-pods"} == 10
+      expr: up{app="isprediksjon", job="kubernetes-pods"} == 0
       for: 5m
       description: "Det er ingen pods for app kjørende i namespace og dermed er appen nede"
       action: "Undersøk hvorfor pods er nede og få den kjørende igjen!"
