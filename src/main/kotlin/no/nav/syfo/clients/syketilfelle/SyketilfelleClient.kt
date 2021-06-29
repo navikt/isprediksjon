@@ -61,7 +61,7 @@ class SyketilfelleClient(
                 return response.receive<KOppfolgingstilfellePerson>()
             }
             HttpStatusCode.NoContent -> {
-                log.error("Syketilfelle returned HTTP-${response.status.value}: No Oppfolgingstilfelle was found for AktorId")
+                log.warn("Syketilfelle returned HTTP-${response.status.value}: No Oppfolgingstilfelle was found for AktorId")
                 COUNT_CALL_SYKETILFELLE_OPPFOLGINGSTILFELLE_AKTOR_EMPTY.inc()
                 return null
             }
