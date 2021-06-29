@@ -47,7 +47,7 @@ class OppfolgingstilfelleService(
     }
 
     private fun skipOppfolgingstilfelleWithMissingValue(missingValue: MissingValue) {
-        log.error("Skipping Oppfolgingstilfelle due to missing value ${missingValue.name}")
+        log.warn("Skipping Oppfolgingstilfelle due to missing value ${missingValue.name}")
         when (missingValue) {
             MissingValue.FODSELSNUMMER -> COUNT_OPPFOLGINGSTILFELLE_SKIPPED_FODSELSNUMMER.inc()
             MissingValue.OPPFOLGINGSTILFELLE -> COUNT_OPPFOLGINGSTILFELLE_SKIPPED_OPPFOLGINGSTILFELLE.inc()
