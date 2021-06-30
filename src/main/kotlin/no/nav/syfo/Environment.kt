@@ -21,15 +21,15 @@ data class Environment(
     val databaseMountPathVault: String = getEnvVar("DATABASE_MOUNT_PATH_VAULT"),
     val databaseName: String = getEnvVar("DATABASE_NAME", "isprediksjon"),
     val isprediksjonDBURL: String = getEnvVar("ISPREDIKSJON_DB_URL"),
-    val aktorregisterV1Url: String = getEnvVar("AKTORREGISTER_V1_URL", "https://app.adeo.no/aktoerregister/api/v1"),
-    val stsRestUrl: String = getEnvVar("SECURITY_TOKEN_SERVICE_REST_URL", "https://security-token-service.nais.adeo.no"),
-    val syketilfelleUrl: String = getEnvVar("SYFOSYKETILFELLE_URL", "http://syfosyketilfelle"),
+    val aktorregisterV1Url: String = getEnvVar("AKTORREGISTER_V1_URL"),
+    val stsRestUrl: String = getEnvVar("SECURITY_TOKEN_SERVICE_REST_URL"),
+    val syketilfelleUrl: String = getEnvVar("SYFOSYKETILFELLE_URL"),
 
     val isProcessOppfolgingstilfelleOn: Boolean = getEnvVar("IS_PROCESS_OPPFOLGINGSTILFELLE_ON", "false").toBoolean(),
 
     val developmentMode: Boolean = getEnvVar("DEVELOPMENT_MODE", "false").toBoolean(),
 
-    val tilgangskontrollUrl: String = getEnvVar("TILGANGSKONTROLL_URL", "https://syfo-tilgangskontroll.nais.adeo.no"),
+    val tilgangskontrollUrl: String = getEnvVar("TILGANGSKONTROLL_URL"),
 
     val tilgangPath: String = getEnvVar("TILGANG_PATH", "/var/run/secrets/nais.io/vault/tilgang.json")
 )
