@@ -45,11 +45,11 @@ fun main() {
 
             val vaultCredentialService = VaultCredentialService()
 
+            applicationState.alive = true
+
             if (!env.developmentMode) {
                 RenewVaultService(vaultCredentialService, applicationState).startRenewTasks()
             }
-
-            applicationState.alive = true
 
             module {
                 databaseModule(
