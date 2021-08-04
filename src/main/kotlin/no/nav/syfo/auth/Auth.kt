@@ -1,9 +1,6 @@
 package no.nav.syfo.auth
 
 import com.auth0.jwk.JwkProviderBuilder
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -13,10 +10,11 @@ import io.ktor.client.features.json.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.runBlocking
 import net.logstash.logback.argument.StructuredArguments
-import java.net.URL
-import java.util.concurrent.TimeUnit
+import no.nav.syfo.util.configuredJacksonMapper
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner
 import java.net.ProxySelector
+import java.net.URL
+import java.util.concurrent.TimeUnit
 
 fun Application.auth(wellKnown: WellKnown, acceptedAudienceList: List<String>) {
     val jwkProvider = JwkProviderBuilder(URL(wellKnown.jwks_uri))
@@ -57,11 +55,7 @@ data class WellKnown(
 
 val proxyConfig: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
     install(JsonFeature) {
-        serializer = JacksonSerializer {
-            registerKotlinModule()
-            registerModule(JavaTimeModule())
-            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        }
+        serializer = JacksonSerializer(configuredJacksonMapper())
     }
     engine {
         customizeClient {
