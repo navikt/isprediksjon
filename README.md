@@ -13,12 +13,19 @@ Application written in Kotlin used to store sykmeldinger and extra info to be us
 
 * JDK 11
 
+### Lint (Ktlint)
+##### Command line
+Run checking: `./gradlew --continue ktlintCheck`
+
+Run formatting: `./gradlew ktlintFormat`
+##### Git Hooks
+Apply checking: `./gradlew addKtlintCheckGitPreCommitHook`
+
+Apply formatting: `./gradlew addKtlintFormatGitPreCommitHook`
+
 #### Build and run tests
 To build locally and run the integration tests you can simply run `./gradlew shadowJar` or on windows 
 `gradlew.bat shadowJar`
-
-#### Lint
-Run `./gradlew --continue ktlintCheck`
 
 #### Creating a docker image
 Creating a docker image should be as simple as `docker build -t isprediksjon .`
