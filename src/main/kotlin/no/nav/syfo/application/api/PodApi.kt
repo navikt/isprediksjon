@@ -11,7 +11,7 @@ import io.prometheus.client.CollectorRegistry
 import io.prometheus.client.exporter.common.TextFormat
 import no.nav.syfo.application.ApplicationState
 
-fun Routing.registerNaisApi(
+fun Routing.registerPodApi(
     applicationState: ApplicationState,
     readynessCheck: () -> Boolean = { applicationState.ready },
     alivenessCheck: () -> Boolean = { applicationState.alive },

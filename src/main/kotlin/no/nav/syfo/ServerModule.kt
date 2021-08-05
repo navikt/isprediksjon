@@ -4,7 +4,7 @@ import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.routing.*
 import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.application.api.registerNaisApi
+import no.nav.syfo.application.api.registerPodApi
 import no.nav.syfo.application.api.registerPrediksjon
 import no.nav.syfo.application.installContentNegotiation
 import no.nav.syfo.auth.*
@@ -31,7 +31,7 @@ fun Application.serverModule(
     )
 
     routing {
-        registerNaisApi(applicationState)
+        registerPodApi(applicationState)
         authenticate(JwtIssuerType.INTERN_AZUREAD_V1.name) {
             registerPrediksjon(
                 database,
