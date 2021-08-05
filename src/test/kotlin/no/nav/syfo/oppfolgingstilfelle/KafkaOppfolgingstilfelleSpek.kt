@@ -51,7 +51,7 @@ object KafkaOppfolgingstilfelleSpek : Spek({
             embeddedEnvironment.brokersURL
         )
 
-        val vaultSecrets = vaultSecrets
+        val vaultSecrets = testVaultSecrets
 
         val database = TestDB()
 
@@ -106,7 +106,7 @@ object KafkaOppfolgingstilfelleSpek : Spek({
         }
 
         describe("Read and store PPrediksjonInput") {
-            val consumerPropertiesOppfolgingstilfelle = kafkaConsumerOppfolgingstilfelleProperties(env, testutil.vaultSecrets)
+            val consumerPropertiesOppfolgingstilfelle = kafkaConsumerOppfolgingstilfelleProperties(env, testutil.testVaultSecrets)
                 .overrideForTest()
 
             val kafkaConsumerOppfolgingstilfelle = KafkaConsumer<String, String>(consumerPropertiesOppfolgingstilfelle)

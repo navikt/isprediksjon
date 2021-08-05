@@ -1,15 +1,10 @@
 package no.nav.syfo.application.api
 
-import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.http.*
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.server.testing.*
-import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_ERROR
 import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_FAILED
 import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_FORBIDDEN
@@ -17,8 +12,8 @@ import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_SUCCESS
 import no.nav.syfo.prediksjon.PrediksjonFrontend
 import no.nav.syfo.prediksjon.createPrediksjonOutputTest
 import no.nav.syfo.prediksjon.toPrediksjonFrontend
-import no.nav.syfo.serverModule
 import no.nav.syfo.util.bearerHeader
+import no.nav.syfo.util.configuredJacksonMapper
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -28,72 +23,38 @@ import testutil.UserConstants.ARBEIDSTAKER_VEILEDER_NO_ACCESS
 import testutil.UserConstants.VEILEDER_IDENT
 import testutil.generator.generateOldPrediksjonOutput
 import testutil.generator.generatePrediksjonOutputLong
-import testutil.mock.AzureAdV2Mock
-import testutil.mock.VeilederTilgangskontrollMock
-import testutil.mock.wellKnownInternADV2Mock
-import testutil.mock.wellKnownMock
 
 class PrediksjonApiSpek : Spek({
-    val objectMapper: ObjectMapper = ObjectMapper().apply {
-        registerKotlinModule()
-        registerModule(JavaTimeModule())
-        configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-    }
+    val objectMapper: ObjectMapper = configuredJacksonMapper()
 
-    describe("PrediksjonApiSpek") {
+    describe(PrediksjonApiSpek::class.java.simpleName) {
 
         with(TestApplicationEngine()) {
             start()
 
-            val azureAdV2Mock = AzureAdV2Mock()
-            val tilgangskontrollMock = VeilederTilgangskontrollMock()
+            val externalMockEnvironment = ExternalMockEnvironment()
+            val database = externalMockEnvironment.database
 
-            val applicationState = ApplicationState(
-                alive = true,
-                ready = true
-            )
-
-            val database = TestDB()
-
-            val environment = testEnvironment(
-                getRandomPort(),
-                "",
-                azureTokenEndpoint = azureAdV2Mock.url,
-                tilgangskontrollUrl = tilgangskontrollMock.url
-            )
-
-            val wellKnown = wellKnownMock()
-            val wellKnownInternADV2 = wellKnownInternADV2Mock()
-
-            application.serverModule(
-                applicationState = applicationState,
-                database = database,
-                environment = environment,
-                wellKnownInternADV1 = wellKnown,
-                wellKnownInternADV2 = wellKnownInternADV2,
+            application.testApiModule(
+                externalMockEnvironment = externalMockEnvironment,
             )
 
             beforeGroup {
-                azureAdV2Mock.server.start()
-                tilgangskontrollMock.server.start()
+                externalMockEnvironment.startExternalMocks()
+            }
+
+            afterGroup {
+                externalMockEnvironment.stopExternalMocks()
             }
 
             afterEachTest {
                 database.connection.dropData("prediksjon_output")
             }
 
-            afterGroup {
-                azureAdV2Mock.server.stop(1L, 10L)
-                tilgangskontrollMock.server.stop(1L, 10L)
-
-                database.stop()
-            }
-
             val url = "$apiBasePath$apiPrediksjon"
             val validToken = generateJWT(
-                environment.loginserviceClientId,
-                wellKnown.issuer,
+                externalMockEnvironment.environment.loginserviceClientId,
+                externalMockEnvironment.wellKnownInternADV1.issuer,
                 VEILEDER_IDENT,
             )
 

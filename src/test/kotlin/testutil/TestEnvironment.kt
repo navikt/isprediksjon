@@ -2,6 +2,7 @@ package testutil
 
 import no.nav.syfo.Environment
 import no.nav.syfo.VaultSecrets
+import no.nav.syfo.application.ApplicationState
 import java.net.ServerSocket
 import java.util.*
 
@@ -9,7 +10,7 @@ fun testEnvironment(
     port: Int,
     kafkaBootstrapServers: String,
     azureTokenEndpoint: String = "azureTokenEndpoint",
-    tilgangskontrollUrl: String = ""
+    syfotilgangskontrollUrl: String = ""
 ) = Environment(
     applicationName = "isprediksjon",
     applicationPort = port,
@@ -35,13 +36,18 @@ fun testEnvironment(
     syketilfelleUrl = "http://syfosyketilfelle:0001",
     developmentMode = true,
     syfotilgangskontrollClientId = "syfotilgangskontrollClientId",
-    tilgangskontrollUrl = tilgangskontrollUrl,
+    tilgangskontrollUrl = syfotilgangskontrollUrl,
     tilgangPath = "./src/test/resources/tilgang.json"
 )
 
-val vaultSecrets = VaultSecrets(
+val testVaultSecrets = VaultSecrets(
     "username",
     "password"
+)
+
+fun testAppState() = ApplicationState(
+    alive = true,
+    ready = true,
 )
 
 fun Properties.overrideForTest(): Properties = apply {

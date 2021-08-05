@@ -21,7 +21,7 @@ import testutil.getPrediksjonInput
 import testutil.mock.AktorregisterMock
 import testutil.mock.StsRestMock
 import testutil.mock.SyketilfelleMock
-import testutil.vaultSecrets
+import testutil.testVaultSecrets
 
 @InternalAPI
 object OppfolgingstilfelleServiceSpek : Spek({
@@ -29,7 +29,7 @@ object OppfolgingstilfelleServiceSpek : Spek({
     with(TestApplicationEngine()) {
         start()
 
-        val vaultSecrets = vaultSecrets
+        val vaultSecrets = testVaultSecrets
 
         val database = TestDB()
 

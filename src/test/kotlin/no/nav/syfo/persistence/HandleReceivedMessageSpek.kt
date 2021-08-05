@@ -75,7 +75,7 @@ object HandleReceivedMessageSpek : Spek({
         with(TestApplicationEngine()) {
             start()
 
-            val consumerPropertiesOversikthendelse = kafkaConsumerSmregProperties(env, vaultSecrets)
+            val consumerPropertiesOversikthendelse = kafkaConsumerSmregProperties(env, testVaultSecrets)
                 .overrideForTest()
                 .apply {
                     put("specific.avro.reader", false)
