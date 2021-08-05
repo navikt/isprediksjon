@@ -7,32 +7,37 @@ import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.api.registerNaisApi
 import no.nav.syfo.application.api.registerPrediksjon
 import no.nav.syfo.application.installContentNegotiation
-import no.nav.syfo.auth.WellKnown
-import no.nav.syfo.auth.auth
+import no.nav.syfo.auth.*
 import no.nav.syfo.clients.Tilgangskontroll
 import no.nav.syfo.database.DatabaseInterface
-import no.nav.syfo.auth.MidlertidigTilgangsSjekk
 
 fun Application.serverModule(
     applicationState: ApplicationState,
     database: DatabaseInterface,
-    env: Environment,
-    wellKnown: WellKnown
+    environment: Environment,
+    wellKnownInternADV1: WellKnown,
 ) {
     log.info("Initialization of server module starting")
 
     installContentNegotiation()
-    auth(wellKnown, listOf(env.loginserviceClientId))
+    auth(
+        jwtIssuerList = listOf(
+            JwtIssuer(
+                acceptedAudienceList = listOf(environment.loginserviceClientId),
+                jwtIssuerType = JwtIssuerType.INTERN_AZUREAD_V1,
+                wellKnown = wellKnownInternADV1,
+            ),
+        ),
+    )
 
     routing {
         registerNaisApi(applicationState)
-        authenticate {
+        authenticate(JwtIssuerType.INTERN_AZUREAD_V1.name) {
             registerPrediksjon(
                 database,
-                Tilgangskontroll(env.tilgangskontrollUrl),
-                MidlertidigTilgangsSjekk(env.tilgangPath)
+                Tilgangskontroll(environment.tilgangskontrollUrl),
+                MidlertidigTilgangsSjekk(environment.tilgangPath),
             )
         }
     }
-    log.info("Initialization of server module done")
 }

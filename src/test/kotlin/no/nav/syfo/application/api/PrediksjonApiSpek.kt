@@ -64,8 +64,8 @@ class PrediksjonApiSpek : Spek({
             application.serverModule(
                 applicationState = applicationState,
                 database = database,
-                env = environment,
-                wellKnown = wellKnown
+                environment = environment,
+                wellKnownInternADV1 = wellKnown
             )
 
             beforeGroup {
