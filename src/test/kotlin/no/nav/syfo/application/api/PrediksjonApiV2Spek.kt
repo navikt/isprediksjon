@@ -1,11 +1,7 @@
 package no.nav.syfo.application.api
 
-import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.http.*
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.server.testing.*
@@ -19,6 +15,7 @@ import no.nav.syfo.prediksjon.createPrediksjonOutputTest
 import no.nav.syfo.prediksjon.toPrediksjonFrontend
 import no.nav.syfo.serverModule
 import no.nav.syfo.util.bearerHeader
+import no.nav.syfo.util.configuredJacksonMapper
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -33,15 +30,10 @@ import testutil.mock.VeilederTilgangskontrollMock
 import testutil.mock.wellKnownInternADV2Mock
 import testutil.mock.wellKnownMock
 
-class PrediksjonApiSpek : Spek({
-    val objectMapper: ObjectMapper = ObjectMapper().apply {
-        registerKotlinModule()
-        registerModule(JavaTimeModule())
-        configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-    }
+class PrediksjonApiV2Spek : Spek({
+    val objectMapper: ObjectMapper = configuredJacksonMapper()
 
-    describe("PrediksjonApiSpek") {
+    describe(PrediksjonApiV2Spek::class.java.simpleName) {
 
         with(TestApplicationEngine()) {
             start()
@@ -51,16 +43,16 @@ class PrediksjonApiSpek : Spek({
 
             val applicationState = ApplicationState(
                 alive = true,
-                ready = true
+                ready = true,
             )
 
             val database = TestDB()
 
             val environment = testEnvironment(
-                getRandomPort(),
-                "",
+                port = getRandomPort(),
+                kafkaBootstrapServers = "",
                 azureTokenEndpoint = azureAdV2Mock.url,
-                tilgangskontrollUrl = tilgangskontrollMock.url
+                tilgangskontrollUrl = tilgangskontrollMock.url,
             )
 
             val wellKnown = wellKnownMock()
@@ -90,11 +82,11 @@ class PrediksjonApiSpek : Spek({
                 database.stop()
             }
 
-            val url = "$apiBasePath$apiPrediksjon"
+            val url = "$apiV2BasePath$apiV2PrediksjonPath"
             val validToken = generateJWT(
-                environment.loginserviceClientId,
-                wellKnown.issuer,
-                VEILEDER_IDENT,
+                audience = environment.azureAppClientId,
+                issuer = wellKnownInternADV2.issuer,
+                navIdent = VEILEDER_IDENT,
             )
 
             describe("Successful get") {

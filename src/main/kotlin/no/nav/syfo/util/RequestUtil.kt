@@ -1,5 +1,7 @@
 package no.nav.syfo.util
 
+import io.ktor.application.*
+import io.ktor.util.pipeline.*
 import net.logstash.logback.argument.StructuredArguments
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -16,6 +18,10 @@ fun basicHeader(
     credentialUsername: String,
     credentialPassword: String
 ) = "Basic " + Base64.getEncoder().encodeToString(java.lang.String.format("%s:%s", credentialUsername, credentialPassword).toByteArray())
+
+fun PipelineContext<out Unit, ApplicationCall>.getCallId(): String {
+    return this.call.request.headers[NAV_CALL_ID].toString()
+}
 
 fun bearerHeader(token: String) = "Bearer $token"
 

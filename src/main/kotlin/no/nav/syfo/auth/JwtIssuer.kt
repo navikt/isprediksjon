@@ -8,4 +8,5 @@ data class JwtIssuer(
 
 enum class JwtIssuerType {
     INTERN_AZUREAD_V1,
+    INTERN_AZUREAD_V2,
 }

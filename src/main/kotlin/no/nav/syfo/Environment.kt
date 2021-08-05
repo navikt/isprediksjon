@@ -7,6 +7,11 @@ data class Environment(
     val loginserviceClientId: String = getEnvVar("LOGINSERVICE_CLIENT_ID", defaultValue = "1234"),
     val aadDiscoveryUrl: String = getEnvVar("AADDISCOVERY_URL"),
 
+    val azureAppClientId: String = getEnvVar("AZURE_APP_CLIENT_ID"),
+    val azureAppClientSecret: String = getEnvVar("AZURE_APP_CLIENT_SECRET"),
+    val azureAppWellKnownUrl: String = getEnvVar("AZURE_APP_WELL_KNOWN_URL"),
+    val azureTokenEndpoint: String = getEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"),
+
     val kafkaBootstrapServers: String = getEnvVar("KAFKA_BOOTSTRAP_SERVERS_URL"),
     val oppfolgingstilfelleTopic: String = "aapen-syfo-oppfolgingstilfelle-v1",
     val sm2013ManuellBehandlingTopic: String = getEnvVar("KAFKA_SM2013_MANUELL_BEHANDLING", "privat-syfo-sm2013-manuellBehandling"),
@@ -30,6 +35,7 @@ data class Environment(
     val developmentMode: Boolean = getEnvVar("DEVELOPMENT_MODE", "false").toBoolean(),
 
     val tilgangskontrollUrl: String = getEnvVar("TILGANGSKONTROLL_URL"),
+    val syfotilgangskontrollClientId: String = getEnvVar("SYFOTILGANGSKONTROLL_CLIENT_ID"),
 
     val tilgangPath: String = getEnvVar("TILGANG_PATH", "/var/run/secrets/nais.io/vault/tilgang.json")
 )

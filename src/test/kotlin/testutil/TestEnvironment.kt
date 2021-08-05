@@ -8,6 +8,7 @@ import java.util.*
 fun testEnvironment(
     port: Int,
     kafkaBootstrapServers: String,
+    azureTokenEndpoint: String = "azureTokenEndpoint",
     tilgangskontrollUrl: String = ""
 ) = Environment(
     applicationName = "isprediksjon",
@@ -27,8 +28,13 @@ fun testEnvironment(
     stsRestUrl = "http://stsrest",
     loginserviceClientId = "1234",
     aadDiscoveryUrl = "",
+    azureAppClientId = "app-client-id",
+    azureAppClientSecret = "app-secret",
+    azureAppWellKnownUrl = "wellknownurl",
+    azureTokenEndpoint = azureTokenEndpoint,
     syketilfelleUrl = "http://syfosyketilfelle:0001",
     developmentMode = true,
+    syfotilgangskontrollClientId = "syfotilgangskontrollClientId",
     tilgangskontrollUrl = tilgangskontrollUrl,
     tilgangPath = "./src/test/resources/tilgang.json"
 )

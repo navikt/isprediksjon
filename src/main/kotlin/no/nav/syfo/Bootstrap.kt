@@ -51,6 +51,8 @@ fun main() {
                 RenewVaultService(vaultCredentialService, applicationState).startRenewTasks()
             }
 
+            val wellKnownInternADV2 = getWellKnown(env.azureAppWellKnownUrl)
+
             module {
                 databaseModule(
                     applicationState,
@@ -61,7 +63,8 @@ fun main() {
                     applicationState,
                     database,
                     env,
-                    getWellKnown(env.aadDiscoveryUrl)
+                    getWellKnown(env.aadDiscoveryUrl),
+                    wellKnownInternADV2,
                 )
                 kafkaModule(
                     applicationState,
