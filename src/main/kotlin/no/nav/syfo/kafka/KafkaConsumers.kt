@@ -1,7 +1,7 @@
 package no.nav.syfo.kafka
 
-import no.nav.syfo.Environment
-import no.nav.syfo.VaultSecrets
+import no.nav.syfo.application.Environment
+import no.nav.syfo.application.VaultSecrets
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer

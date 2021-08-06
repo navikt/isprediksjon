@@ -5,7 +5,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import no.nav.syfo.application.installContentNegotiation
+import no.nav.syfo.application.api.installContentNegotiation
 import no.nav.syfo.clients.syketilfelle.domain.KOppfolgingstilfellePerson
 import testutil.UserConstants
 import testutil.generator.generateKOppfolgingstilfelle

@@ -1,4 +1,4 @@
-package no.nav.syfo.application.api
+package no.nav.syfo.prediksjon.api
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -24,10 +24,10 @@ import testutil.UserConstants.VEILEDER_IDENT
 import testutil.generator.generateOldPrediksjonOutput
 import testutil.generator.generatePrediksjonOutputLong
 
-class PrediksjonApiSpek : Spek({
+class PrediksjonApiV2Spek : Spek({
     val objectMapper: ObjectMapper = configuredJacksonMapper()
 
-    describe(PrediksjonApiSpek::class.java.simpleName) {
+    describe(PrediksjonApiV2Spek::class.java.simpleName) {
 
         with(TestApplicationEngine()) {
             start()
@@ -51,11 +51,11 @@ class PrediksjonApiSpek : Spek({
                 database.connection.dropData("prediksjon_output")
             }
 
-            val url = "$apiBasePath$apiPrediksjon"
+            val url = "$apiV2BasePath$apiV2PrediksjonPath"
             val validToken = generateJWT(
-                externalMockEnvironment.environment.loginserviceClientId,
-                externalMockEnvironment.wellKnownInternADV1.issuer,
-                VEILEDER_IDENT,
+                audience = externalMockEnvironment.environment.azureAppClientId,
+                issuer = externalMockEnvironment.wellKnownInternADV2.issuer,
+                navIdent = VEILEDER_IDENT,
             )
 
             describe("Successful get") {

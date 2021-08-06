@@ -1,6 +1,6 @@
 package no.nav.syfo.persistence.db
 
-import no.nav.syfo.Environment
+import no.nav.syfo.application.Environment
 import no.nav.syfo.util.toPGObject
 import java.sql.Connection
 import java.sql.Timestamp

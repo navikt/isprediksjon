@@ -5,7 +5,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import no.nav.syfo.application.installContentNegotiation
+import no.nav.syfo.application.api.installContentNegotiation
 import no.nav.syfo.clients.aktor.IdentType
 import no.nav.syfo.clients.aktor.domain.NO_IDENT_ERROR_MSG
 import no.nav.syfo.util.NAV_PERSONIDENTER

@@ -1,4 +1,4 @@
-package no.nav.syfo
+package no.nav.syfo.application
 
 data class Environment(
     val applicationName: String = getEnvVar("NAIS_APP_NAME", "isprediksjon"),

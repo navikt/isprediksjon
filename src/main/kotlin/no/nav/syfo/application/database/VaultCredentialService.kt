@@ -1,4 +1,4 @@
-package no.nav.syfo.database
+package no.nav.syfo.application.database
 
 import com.bettercloud.vault.VaultException
 import kotlinx.coroutines.delay

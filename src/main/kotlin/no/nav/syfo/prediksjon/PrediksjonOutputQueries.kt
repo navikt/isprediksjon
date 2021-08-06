@@ -2,8 +2,8 @@ package no.nav.syfo.prediksjon
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.syfo.database.DatabaseInterface
-import no.nav.syfo.database.toList
+import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.application.database.toList
 import no.nav.syfo.domain.AktorId
 import no.nav.syfo.domain.Fodselsnummer
 import java.sql.ResultSet

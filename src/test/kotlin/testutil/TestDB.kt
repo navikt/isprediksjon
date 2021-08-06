@@ -1,9 +1,9 @@
 package testutil
 
-import no.nav.syfo.database.Database
-import no.nav.syfo.database.DatabaseInterface
-import no.nav.syfo.database.DbConfig
-import no.nav.syfo.database.toList
+import no.nav.syfo.application.database.Database
+import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.application.database.DbConfig
+import no.nav.syfo.application.database.toList
 import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.prediksjon.input.PPrediksjonInput
 import org.testcontainers.containers.PostgreSQLContainer

@@ -6,7 +6,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import no.nav.syfo.application.installContentNegotiation
+import no.nav.syfo.application.api.installContentNegotiation
 import no.nav.syfo.clients.tilgangskontroll.Tilgangskontroll.Companion.TILGANGSKONTROLL_V2_PERSON_PATH
 import no.nav.syfo.clients.tilgangskontroll.Tilgangskontroll.Tilgang
 import testutil.UserConstants.ARBEIDSTAKER_FNR

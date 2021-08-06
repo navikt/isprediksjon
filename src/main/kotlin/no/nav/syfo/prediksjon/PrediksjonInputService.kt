@@ -1,6 +1,6 @@
 package no.nav.syfo.prediksjon
 
-import no.nav.syfo.database.DatabaseInterface
+import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.oppfolgingstilfelle.domain.PersonOppfolgingstilfelle
 
 class PrediksjonInputService(

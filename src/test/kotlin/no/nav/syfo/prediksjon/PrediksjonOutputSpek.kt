@@ -3,8 +3,8 @@ package no.nav.syfo.prediksjon
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.server.testing.*
 import io.mockk.unmockkAll
-import no.nav.syfo.database.DatabaseInterface
-import no.nav.syfo.database.toList
+import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.application.database.toList
 import org.amshove.kluent.shouldBeEqualTo
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe

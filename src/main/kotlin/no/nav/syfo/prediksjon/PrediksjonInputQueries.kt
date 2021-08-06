@@ -1,7 +1,7 @@
 package no.nav.syfo.prediksjon
 
-import no.nav.syfo.database.DatabaseInterface
-import no.nav.syfo.database.toList
+import no.nav.syfo.application.database.DatabaseInterface
+import no.nav.syfo.application.database.toList
 import no.nav.syfo.oppfolgingstilfelle.domain.PersonOppfolgingstilfelle
 import java.sql.SQLException
 import java.sql.Timestamp

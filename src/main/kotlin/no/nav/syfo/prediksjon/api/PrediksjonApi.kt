@@ -1,4 +1,4 @@
-package no.nav.syfo.application.api
+package no.nav.syfo.prediksjon.api
 
 import io.ktor.application.*
 import io.ktor.http.*
@@ -6,7 +6,7 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import no.nav.syfo.application.api.authentication.getNAVIdentFromToken
 import no.nav.syfo.clients.tilgangskontroll.Tilgangskontroll
-import no.nav.syfo.database.DatabaseInterface
+import no.nav.syfo.application.database.DatabaseInterface
 import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_ERROR
 import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_FAILED
