@@ -1,8 +1,8 @@
-package no.nav.syfo
+package no.nav.syfo.database
 
 import io.ktor.application.*
+import no.nav.syfo.Environment
 import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.database.*
 
 lateinit var database: DatabaseInterface
 fun Application.databaseModule(

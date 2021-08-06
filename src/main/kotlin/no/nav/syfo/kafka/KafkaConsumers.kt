@@ -1,4 +1,4 @@
-package no.nav.syfo.clients
+package no.nav.syfo.kafka
 
 import no.nav.syfo.Environment
 import no.nav.syfo.VaultSecrets

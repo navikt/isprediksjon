@@ -1,4 +1,4 @@
-package no.nav.syfo.clients
+package no.nav.syfo.clients.tilgangskontroll
 
 import io.ktor.client.call.*
 import io.ktor.client.features.*
@@ -7,6 +7,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import net.logstash.logback.argument.StructuredArguments
 import no.nav.syfo.clients.azuread.v2.AzureAdV2Client
+import no.nav.syfo.clients.httpClientDefault
 import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.metric.COUNT_TILGANGSKONTROLL_FAIL
 import no.nav.syfo.metric.COUNT_TILGANGSKONTROLL_FORBIDDEN

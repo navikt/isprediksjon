@@ -9,8 +9,11 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.slf4j.MDCContext
 import no.nav.syfo.application.ApplicationState
 import no.nav.syfo.application.api.apiModule
-import no.nav.syfo.auth.getWellKnown
+import no.nav.syfo.clients.azuread.v2.wellknown.getWellKnown
 import no.nav.syfo.database.VaultCredentialService
+import no.nav.syfo.database.database
+import no.nav.syfo.database.databaseModule
+import no.nav.syfo.kafka.kafkaModule
 import no.nav.syfo.util.getFileAsString
 import no.nav.syfo.vault.RenewVaultService
 import org.slf4j.Logger

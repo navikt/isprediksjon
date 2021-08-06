@@ -8,8 +8,8 @@ import io.mockk.unmockkAll
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import no.nav.common.KafkaEnvironment
-import no.nav.syfo.clients.kafkaConsumerSmregProperties
-import no.nav.syfo.pollAndProcessSMRegTopic
+import no.nav.syfo.kafka.kafkaConsumerSmregProperties
+import no.nav.syfo.kafka.pollAndProcessSMRegTopic
 import org.amshove.kluent.shouldBeEqualTo
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import org.apache.kafka.clients.consumer.KafkaConsumer

@@ -1,4 +1,4 @@
-package no.nav.syfo.auth
+package no.nav.syfo.tilgangskontroll
 
 import com.fasterxml.jackson.databind.*
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule

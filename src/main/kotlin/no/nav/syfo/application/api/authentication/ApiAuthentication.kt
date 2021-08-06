@@ -1,24 +1,16 @@
-package no.nav.syfo.auth
+package no.nav.syfo.application.api.authentication
 
 import com.auth0.jwk.JwkProviderBuilder
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
-import io.ktor.client.*
-import io.ktor.client.engine.apache.*
-import io.ktor.client.features.json.*
-import io.ktor.client.request.*
-import kotlinx.coroutines.runBlocking
 import net.logstash.logback.argument.StructuredArguments
-import no.nav.syfo.util.configuredJacksonMapper
-import org.apache.http.impl.conn.SystemDefaultRoutePlanner
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.net.ProxySelector
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
-private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.auth")
+private val log: Logger = LoggerFactory.getLogger("no.nav.syfo.api.authentication")
 
 fun Application.auth(
     jwtIssuerList: List<JwtIssuer>,
@@ -62,24 +54,3 @@ fun hasExpectedAudience(
 ): Boolean {
     return expectedAudience.any { credentials.payload.audience.contains(it) }
 }
-
-data class WellKnown(
-    val authorization_endpoint: String,
-    val token_endpoint: String,
-    val jwks_uri: String,
-    val issuer: String,
-)
-
-val proxyConfig: HttpClientConfig<ApacheEngineConfig>.() -> Unit = {
-    install(JsonFeature) {
-        serializer = JacksonSerializer(configuredJacksonMapper())
-    }
-    engine {
-        customizeClient {
-            setRoutePlanner(SystemDefaultRoutePlanner(ProxySelector.getDefault()))
-        }
-    }
-}
-
-fun getWellKnown(wellKnownUrl: String) =
-    runBlocking { HttpClient(Apache, proxyConfig).use { cli -> cli.get<WellKnown>(wellKnownUrl) } }

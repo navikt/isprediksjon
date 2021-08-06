@@ -14,10 +14,10 @@ import kotlinx.coroutines.runBlocking
 import no.nav.common.KafkaEnvironment
 import no.nav.syfo.clients.aktor.AktorService
 import no.nav.syfo.clients.aktor.AktorregisterClient
-import no.nav.syfo.clients.kafkaConsumerOppfolgingstilfelleProperties
+import no.nav.syfo.kafka.kafkaConsumerOppfolgingstilfelleProperties
 import no.nav.syfo.clients.sts.StsRestClient
 import no.nav.syfo.clients.syketilfelle.SyketilfelleClient
-import no.nav.syfo.pollAndProcessOppfolgingstilfelleTopic
+import no.nav.syfo.kafka.pollAndProcessOppfolgingstilfelleTopic
 import no.nav.syfo.prediksjon.PrediksjonInputService
 import org.amshove.kluent.shouldBeEqualTo
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -106,7 +106,7 @@ object KafkaOppfolgingstilfelleSpek : Spek({
         }
 
         describe("Read and store PPrediksjonInput") {
-            val consumerPropertiesOppfolgingstilfelle = kafkaConsumerOppfolgingstilfelleProperties(env, testutil.testVaultSecrets)
+            val consumerPropertiesOppfolgingstilfelle = kafkaConsumerOppfolgingstilfelleProperties(env, testVaultSecrets)
                 .overrideForTest()
 
             val kafkaConsumerOppfolgingstilfelle = KafkaConsumer<String, String>(consumerPropertiesOppfolgingstilfelle)

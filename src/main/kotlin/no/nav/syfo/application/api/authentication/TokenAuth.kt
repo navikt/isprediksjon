@@ -1,4 +1,4 @@
-package no.nav.syfo.auth
+package no.nav.syfo.application.api.authentication
 
 import com.auth0.jwt.JWT
 

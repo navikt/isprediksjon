@@ -5,9 +5,13 @@ import io.ktor.auth.*
 import io.ktor.routing.*
 import no.nav.syfo.Environment
 import no.nav.syfo.application.ApplicationState
+import no.nav.syfo.application.api.authentication.JwtIssuer
+import no.nav.syfo.application.api.authentication.JwtIssuerType
+import no.nav.syfo.clients.azuread.v2.wellknown.WellKnown
+import no.nav.syfo.application.api.authentication.auth
 import no.nav.syfo.application.installContentNegotiation
-import no.nav.syfo.auth.*
-import no.nav.syfo.clients.Tilgangskontroll
+import no.nav.syfo.tilgangskontroll.*
+import no.nav.syfo.clients.tilgangskontroll.Tilgangskontroll
 import no.nav.syfo.clients.azuread.v2.AzureAdV2Client
 import no.nav.syfo.database.DatabaseInterface
 

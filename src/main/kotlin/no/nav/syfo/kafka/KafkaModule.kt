@@ -1,4 +1,4 @@
-package no.nav.syfo
+package no.nav.syfo.kafka
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -10,13 +10,17 @@ import io.ktor.application.*
 import io.ktor.util.*
 import kotlinx.coroutines.*
 import net.logstash.logback.argument.StructuredArguments
+import no.nav.syfo.Environment
+import no.nav.syfo.VaultSecrets
 import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.clients.KafkaConsumers
+import no.nav.syfo.backgroundTasksContext
 import no.nav.syfo.clients.aktor.AktorService
 import no.nav.syfo.clients.aktor.AktorregisterClient
 import no.nav.syfo.clients.sts.StsRestClient
 import no.nav.syfo.clients.syketilfelle.SyketilfelleClient
 import no.nav.syfo.database.DatabaseInterface
+import no.nav.syfo.database.database
+import no.nav.syfo.log
 import no.nav.syfo.metric.COUNT_ANTALL_SYKMELDINGER_MOTTATT
 import no.nav.syfo.metric.HISTOGRAM_OPPFOLGINGSTILFELLE_DURATION
 import no.nav.syfo.oppfolgingstilfelle.OppfolgingstilfelleService
