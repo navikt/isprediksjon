@@ -1,19 +1,17 @@
-package no.nav.syfo
+package no.nav.syfo.application.api
 
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.routing.*
+import no.nav.syfo.Environment
 import no.nav.syfo.application.ApplicationState
-import no.nav.syfo.application.api.registerPodApi
-import no.nav.syfo.application.api.registerPrediksjon
-import no.nav.syfo.application.api.registerPrediksjonApiV2
 import no.nav.syfo.application.installContentNegotiation
 import no.nav.syfo.auth.*
 import no.nav.syfo.clients.Tilgangskontroll
 import no.nav.syfo.clients.azuread.v2.AzureAdV2Client
 import no.nav.syfo.database.DatabaseInterface
 
-fun Application.serverModule(
+fun Application.apiModule(
     applicationState: ApplicationState,
     database: DatabaseInterface,
     environment: Environment,

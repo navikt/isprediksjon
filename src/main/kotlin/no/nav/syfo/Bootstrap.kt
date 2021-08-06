@@ -8,6 +8,7 @@ import io.ktor.util.*
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.slf4j.MDCContext
 import no.nav.syfo.application.ApplicationState
+import no.nav.syfo.application.api.apiModule
 import no.nav.syfo.auth.getWellKnown
 import no.nav.syfo.database.VaultCredentialService
 import no.nav.syfo.util.getFileAsString
@@ -59,7 +60,7 @@ fun main() {
                     env,
                     vaultCredentialService
                 )
-                serverModule(
+                apiModule(
                     applicationState,
                     database,
                     env,

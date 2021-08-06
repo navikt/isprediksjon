@@ -1,12 +1,12 @@
 package testutil
 
 import io.ktor.application.*
-import no.nav.syfo.serverModule
+import no.nav.syfo.application.api.apiModule
 
 fun Application.testApiModule(
     externalMockEnvironment: ExternalMockEnvironment,
 ) {
-    serverModule(
+    apiModule(
         applicationState = externalMockEnvironment.applicationState,
         database = externalMockEnvironment.database,
         environment = externalMockEnvironment.environment,
