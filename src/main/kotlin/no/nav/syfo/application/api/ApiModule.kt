@@ -47,6 +47,7 @@ fun Application.apiModule(
 
     routing {
         registerPodApi(applicationState)
+        registerPrometheusApi()
         authenticate(JwtIssuerType.INTERN_AZUREAD_V1.name) {
             registerPrediksjon(
                 database,
