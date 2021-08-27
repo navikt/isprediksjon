@@ -15,6 +15,7 @@ import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_FORBIDDEN
 import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_SUCCESS
 import no.nav.syfo.prediksjon.getPrediksjon
 import no.nav.syfo.prediksjon.toPrediksjonFrontend
+import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.util.getCallId
 import no.nav.syfo.util.latestPrediksjon
 import org.slf4j.Logger
@@ -41,7 +42,7 @@ fun Route.registerPrediksjonApiV2(
                     call.request.headers[NAV_PERSONIDENT_HEADER]
                         ?: throw IllegalArgumentException("No PersonIdent supplied")
 
-                val tilgang = tilgangskontroll.hasAccessWithOBO(
+                val tilgang = tilgangskontroll.harTilgangTilBruker(
                     callId = callId,
                     personIdentNumber = Fodselsnummer(requestFnr),
                     token = token,

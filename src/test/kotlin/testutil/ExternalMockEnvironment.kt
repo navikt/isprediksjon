@@ -5,7 +5,6 @@ import no.nav.syfo.application.ApplicationState
 import testutil.mock.AzureAdV2Mock
 import testutil.mock.VeilederTilgangskontrollMock
 import testutil.mock.wellKnownInternADV2Mock
-import testutil.mock.wellKnownMock
 
 class ExternalMockEnvironment {
     val applicationState: ApplicationState = testAppState()
@@ -26,7 +25,6 @@ class ExternalMockEnvironment {
         syfotilgangskontrollUrl = tilgangskontrollMock.url,
     )
     val vaultSecrets = testVaultSecrets
-    val wellKnownInternADV1 = wellKnownMock()
     val wellKnownInternADV2 = wellKnownInternADV2Mock()
 }
 
