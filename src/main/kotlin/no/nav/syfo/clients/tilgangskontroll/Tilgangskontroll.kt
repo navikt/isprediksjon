@@ -31,29 +31,7 @@ class Tilgangskontroll(
 
     private val httpClient = httpClientDefault()
 
-    suspend fun harTilgangTilBruker(fnr: Fodselsnummer, token: String): Boolean {
-        try {
-            val completeUrl = "$url?fnr=${fnr.value}"
-            val tilgang = httpClient.get<Tilgang>(completeUrl) {
-                header(HttpHeaders.Authorization, bearerHeader(token))
-                accept(ContentType.Application.Json)
-            }
-            COUNT_TILGANGSKONTROLL_OK.inc()
-
-            return tilgang.harTilgang
-        } catch (e: ClientRequestException) {
-            return if (e.response.status == HttpStatusCode.Forbidden) {
-                COUNT_TILGANGSKONTROLL_FORBIDDEN.inc()
-                false
-            } else {
-                return handleUnexpectedReponseException(e.response)
-            }
-        } catch (e: ServerResponseException) {
-            return handleUnexpectedReponseException(e.response)
-        }
-    }
-
-    suspend fun hasAccessWithOBO(
+    suspend fun harTilgangTilBruker(
         callId: String,
         personIdentNumber: Fodselsnummer,
         token: String,

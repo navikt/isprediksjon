@@ -4,9 +4,6 @@ data class Environment(
     val applicationName: String = getEnvVar("NAIS_APP_NAME", "isprediksjon"),
     val applicationPort: Int = getEnvVar("APPLICATION_PORT", "8080").toInt(),
 
-    val loginserviceClientId: String = getEnvVar("LOGINSERVICE_CLIENT_ID", defaultValue = "1234"),
-    val aadDiscoveryUrl: String = getEnvVar("AADDISCOVERY_URL"),
-
     val azureAppClientId: String = getEnvVar("AZURE_APP_CLIENT_ID"),
     val azureAppClientSecret: String = getEnvVar("AZURE_APP_CLIENT_SECRET"),
     val azureAppWellKnownUrl: String = getEnvVar("AZURE_APP_WELL_KNOWN_URL"),

@@ -13,24 +13,17 @@ import no.nav.syfo.tilgangskontroll.*
 import no.nav.syfo.clients.tilgangskontroll.Tilgangskontroll
 import no.nav.syfo.clients.azuread.v2.AzureAdV2Client
 import no.nav.syfo.application.database.DatabaseInterface
-import no.nav.syfo.prediksjon.api.registerPrediksjon
 import no.nav.syfo.prediksjon.api.registerPrediksjonApiV2
 
 fun Application.apiModule(
     applicationState: ApplicationState,
     database: DatabaseInterface,
     environment: Environment,
-    wellKnownInternADV1: WellKnown,
     wellKnownInternADV2: WellKnown,
 ) {
     installContentNegotiation()
     auth(
         jwtIssuerList = listOf(
-            JwtIssuer(
-                acceptedAudienceList = listOf(environment.loginserviceClientId),
-                jwtIssuerType = JwtIssuerType.INTERN_AZUREAD_V1,
-                wellKnown = wellKnownInternADV1,
-            ),
             JwtIssuer(
                 acceptedAudienceList = listOf(environment.azureAppClientId),
                 jwtIssuerType = JwtIssuerType.INTERN_AZUREAD_V2,
@@ -53,13 +46,6 @@ fun Application.apiModule(
     routing {
         registerPodApi(applicationState)
         registerPrometheusApi()
-        authenticate(JwtIssuerType.INTERN_AZUREAD_V1.name) {
-            registerPrediksjon(
-                database,
-                veilederTilgangskontrollClient,
-                MidlertidigTilgangsSjekk(environment.tilgangPath),
-            )
-        }
         authenticate(JwtIssuerType.INTERN_AZUREAD_V2.name) {
             registerPrediksjonApiV2(
                 database,

@@ -27,8 +27,6 @@ fun testEnvironment(
     isprediksjonDBURL = "12314.adeo.no",
     aktorregisterV1Url = "http://aktorregister",
     stsRestUrl = "http://stsrest",
-    loginserviceClientId = "1234",
-    aadDiscoveryUrl = "",
     azureAppClientId = "app-client-id",
     azureAppClientSecret = "app-secret",
     azureAppWellKnownUrl = "wellknownurl",

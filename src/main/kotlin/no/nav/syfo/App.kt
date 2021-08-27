@@ -69,7 +69,6 @@ fun main() {
                     applicationState,
                     database,
                     env,
-                    getWellKnown(env.aadDiscoveryUrl),
                     wellKnownInternADV2,
                 )
                 kafkaModule(

@@ -12,6 +12,7 @@ import no.nav.syfo.metric.COUNT_PREDIKSJON_OUTPUT_SUCCESS
 import no.nav.syfo.prediksjon.PrediksjonFrontend
 import no.nav.syfo.prediksjon.createPrediksjonOutputTest
 import no.nav.syfo.prediksjon.toPrediksjonFrontend
+import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.util.bearerHeader
 import no.nav.syfo.util.configuredJacksonMapper
 import org.amshove.kluent.shouldBeEqualTo
