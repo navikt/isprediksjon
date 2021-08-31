@@ -89,7 +89,7 @@ spec:
     - name: IS_PROCESS_OPPFOLGINGSTILFELLE_ON
       value: "true"
     - name: SYFOTILGANGSKONTROLL_CLIENT_ID
-      value: "32e36aa5-1d12-452a-9b1e-9f3f557cbb4d"
+      value: "dev-fss.teamsykefravr.syfo-tilgangskontroll"
     - name: TILGANGSKONTROLL_URL
       value: "https://syfo-tilgangskontroll.nais.preprod.local"
 
