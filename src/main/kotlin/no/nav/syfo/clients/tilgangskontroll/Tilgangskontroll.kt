@@ -13,6 +13,7 @@ import no.nav.syfo.metric.COUNT_TILGANGSKONTROLL_FAIL
 import no.nav.syfo.metric.COUNT_TILGANGSKONTROLL_FORBIDDEN
 import no.nav.syfo.metric.COUNT_TILGANGSKONTROLL_OK
 import no.nav.syfo.util.NAV_CALL_ID
+import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
 import no.nav.syfo.util.bearerHeader
 import org.slf4j.LoggerFactory
 
@@ -21,15 +22,18 @@ class Tilgangskontroll(
     private val baseUrl: String,
     private val syfotilgangskontrollClientId: String,
 ) {
-
-    val url = "$baseUrl/syfo-tilgangskontroll/api/tilgang/bruker"
-
     data class Tilgang(
         val harTilgang: Boolean,
         val begrunnelse: String? = null,
     )
 
     private val httpClient = httpClientDefault()
+
+    private val tilgangskontrollPersonUrl: String
+
+    init {
+        tilgangskontrollPersonUrl = "$baseUrl$TILGANGSKONTROLL_PERSON_PATH"
+    }
 
     suspend fun harTilgangTilBruker(
         callId: String,
@@ -42,9 +46,9 @@ class Tilgangskontroll(
         )?.accessToken ?: throw RuntimeException("Failed to request access to Person: Failed to get OBO token")
 
         try {
-            val url = getTilgangskontrollV2Url(personIdentNumber)
-            val response: HttpResponse = httpClient.get(url) {
+            val response: HttpResponse = httpClient.get(tilgangskontrollPersonUrl) {
                 header(HttpHeaders.Authorization, bearerHeader(oboToken))
+                header(NAV_PERSONIDENT_HEADER, personIdentNumber.value)
                 header(NAV_CALL_ID, callId)
                 accept(ContentType.Application.Json)
             }
@@ -62,10 +66,6 @@ class Tilgangskontroll(
         }
     }
 
-    private fun getTilgangskontrollV2Url(personIdentNumber: Fodselsnummer): String {
-        return "$baseUrl$TILGANGSKONTROLL_V2_PERSON_PATH/${personIdentNumber.value}"
-    }
-
     private fun handleUnexpectedReponseException(response: HttpResponse): Boolean {
         val statusCode = response.status.value.toString()
         log.error(
@@ -78,6 +78,6 @@ class Tilgangskontroll(
 
     companion object {
         private val log = LoggerFactory.getLogger(Tilgangskontroll::class.java)
-        const val TILGANGSKONTROLL_V2_PERSON_PATH = "/syfo-tilgangskontroll/api/tilgang/navident/bruker"
+        const val TILGANGSKONTROLL_PERSON_PATH = "/syfo-tilgangskontroll/api/tilgang/navident/person"
     }
 }
